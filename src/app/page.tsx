@@ -1,20 +1,15 @@
 "use client";
 
 import { useSession, SessionProvider } from "next-auth/react";
-import PlaylistGrid from "@/components/PlaylistGrid";
+import PlaylistManager from "@/components/PlaylistManager";
 
 function HomeContent() {
     const { data: session } = useSession();
 
     if (session) {
         return (
-            <div>
-                <h1>Welcome, {session.user?.name}!</h1>
-                <p>
-                    You are signed in and ready to use the Spotify Playlist
-                    Filter.
-                </p>
-                <PlaylistGrid />
+            <div className="h-[calc(100vh-4rem)]">
+                <PlaylistManager />
             </div>
         );
     }
