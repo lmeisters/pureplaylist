@@ -3,44 +3,29 @@
 import { usePlaylistTracksQuery } from "@/hooks/usePlaylistTracksQuery";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import {
-    Music,
-    Calendar,
-    Activity,
-    Clock,
-    ChevronUp,
-    ChevronDown,
-    Save,
-    Trash2,
-} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogDescription,
-    DialogTrigger,
-} from "@/components/ui/dialog";
 import { spotifyApi } from "@/lib/spotify";
 import { useSession } from "next-auth/react";
 import { useToast } from "@/hooks/use-toast";
+import { Switch } from "@/components/ui/switch";
+import { TrackListHeader } from "./TrackListHeader";
+import { TrackItem } from "./TrackItem";
+import { SavePlaylistDialog } from "./SavePlaylistDialog";
+import { SortButton } from "./SortButton";
 import {
     AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
+    AlertDialogTrigger,
     AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-    AlertDialogTrigger,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogCancel,
+    AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Switch } from "@/components/ui/switch";
+import { Trash2 } from "lucide-react";
 
 interface TrackListProps {
     playlistId: string;
@@ -154,29 +139,6 @@ const TrackList: React.FC<TrackListProps> = ({ playlistId }) => {
             setSortOrder("asc");
         }
     };
-
-    const SortButton = ({
-        field,
-        children,
-    }: {
-        field: SortField;
-        children: React.ReactNode;
-    }) => (
-        <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 flex items-center gap-1"
-            onClick={() => toggleSort(field)}
-        >
-            {children}
-            {sortField === field &&
-                (sortOrder === "asc" ? (
-                    <ChevronUp className="h-4 w-4" />
-                ) : (
-                    <ChevronDown className="h-4 w-4" />
-                ))}
-        </Button>
-    );
 
     const savePlaylist = async (createNew: boolean) => {
         if (!session?.accessToken) {
@@ -413,201 +375,74 @@ const TrackList: React.FC<TrackListProps> = ({ playlistId }) => {
 
     return (
         <div className="h-full flex flex-col">
-            <div className="p-4 font-semibold border-b flex justify-between items-center">
-                <span>Playlist Tracks</span>
-                <div className="space-x-2 flex items-center">
-                    <div className="flex items-center space-x-2">
-                        <Switch
-                            checked={isMultiSelectMode}
-                            onCheckedChange={setIsMultiSelectMode}
-                        />
-                        <span>Multi-select</span>
-                    </div>
-                    {isMultiSelectMode && selectedTracks.size > 0 && (
-                        <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                                <Button variant="destructive" size="sm">
-                                    <Trash2 className="w-4 h-4 mr-2" />
-                                    Delete Selected ({selectedTracks.size})
-                                </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>
-                                        Are you sure?
-                                    </AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                        This will remove {selectedTracks.size}{" "}
-                                        selected track(s) from the playlist.
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                    <AlertDialogCancel>
-                                        Cancel
-                                    </AlertDialogCancel>
-                                    <AlertDialogAction
-                                        onClick={deleteSelectedTracks}
-                                    >
-                                        Delete
-                                    </AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
-                    )}
-                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                        <DialogTrigger asChild>
-                            <Button variant="outline" size="sm">
-                                Save as New Playlist
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Create New Playlist</DialogTitle>
-                                <DialogDescription>
-                                    Enter a name for your new playlist. This
-                                    will create a new playlist with the current
-                                    track order.
-                                </DialogDescription>
-                            </DialogHeader>
-                            <Input
-                                placeholder="Enter new playlist name"
-                                value={newPlaylistName}
-                                onChange={(e) =>
-                                    setNewPlaylistName(e.target.value)
-                                }
-                            />
-                            <Button
-                                onClick={() => savePlaylist(true)}
-                                disabled={isSaving}
-                            >
-                                {isSaving ? "Saving..." : "Create and Save"}
-                            </Button>
-                        </DialogContent>
-                    </Dialog>
-                    <Button
-                        variant="default"
-                        size="sm"
-                        onClick={() => savePlaylist(false)}
-                        disabled={isSaving}
-                    >
-                        <Save className="w-4 h-4 mr-2" />
-                        {isSaving ? "Saving..." : "Update Current Playlist"}
-                    </Button>
-                </div>
-            </div>
+            <TrackListHeader
+                isMultiSelectMode={isMultiSelectMode}
+                setIsMultiSelectMode={setIsMultiSelectMode}
+                selectedTracks={selectedTracks}
+                deleteSelectedTracks={deleteSelectedTracks}
+                setIsDialogOpen={setIsDialogOpen}
+                savePlaylist={savePlaylist}
+                isSaving={isSaving}
+            />
             <div className="p-2 font-semibold border-b grid grid-cols-[auto,auto,2fr,1fr,6rem,6rem,4rem] gap-4 items-center">
                 <span></span>
-                <SortButton field="number">#</SortButton>
-                <SortButton field="title">Title</SortButton>
-                <SortButton field="album">Album</SortButton>
-                <SortButton field="date">
-                    <Calendar className="w-4 h-4" />
+                <SortButton
+                    field="number"
+                    sortField={sortField}
+                    sortOrder={sortOrder}
+                    toggleSort={toggleSort}
+                >
+                    #
                 </SortButton>
-                <SortButton field="bpm">
-                    <Activity className="w-4 h-4" />
+                <SortButton
+                    field="title"
+                    sortField={sortField}
+                    sortOrder={sortOrder}
+                    toggleSort={toggleSort}
+                >
+                    Title
                 </SortButton>
-                <SortButton field="duration">
-                    <Clock className="w-4 h-4" />
+                <SortButton
+                    field="album"
+                    sortField={sortField}
+                    sortOrder={sortOrder}
+                    toggleSort={toggleSort}
+                >
+                    Album
                 </SortButton>
+                <SortButton
+                    field="date"
+                    sortField={sortField}
+                    sortOrder={sortOrder}
+                    toggleSort={toggleSort}
+                    icon="calendar"
+                />
+                <SortButton
+                    field="bpm"
+                    sortField={sortField}
+                    sortOrder={sortOrder}
+                    toggleSort={toggleSort}
+                    icon="activity"
+                />
+                <SortButton
+                    field="duration"
+                    sortField={sortField}
+                    sortOrder={sortOrder}
+                    toggleSort={toggleSort}
+                    icon="clock"
+                />
             </div>
             <ScrollArea className="flex-grow">
                 <div className="pb-2">
                     {sortedTracks.map((item: any) => (
-                        <div key={item.track.id}>
-                            <div className="grid grid-cols-[auto,auto,2fr,1fr,6rem,6rem,4rem] gap-4 items-center p-2">
-                                {isMultiSelectMode ? (
-                                    <Checkbox
-                                        checked={selectedTracks.has(
-                                            item.track.uri
-                                        )}
-                                        onCheckedChange={() =>
-                                            toggleTrackSelection(item.track.uri)
-                                        }
-                                    />
-                                ) : (
-                                    <AlertDialog>
-                                        <AlertDialogTrigger asChild>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() =>
-                                                    setTrackToDelete(
-                                                        item.track.uri
-                                                    )
-                                                }
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
-                                        </AlertDialogTrigger>
-                                        <AlertDialogContent>
-                                            <AlertDialogHeader>
-                                                <AlertDialogTitle>
-                                                    Are you sure?
-                                                </AlertDialogTitle>
-                                                <AlertDialogDescription>
-                                                    This will remove the track "
-                                                    {item.track.name}" from the
-                                                    playlist.
-                                                </AlertDialogDescription>
-                                            </AlertDialogHeader>
-                                            <AlertDialogFooter>
-                                                <AlertDialogCancel>
-                                                    Cancel
-                                                </AlertDialogCancel>
-                                                <AlertDialogAction
-                                                    onClick={() =>
-                                                        deleteTrack(
-                                                            item.track.uri
-                                                        )
-                                                    }
-                                                >
-                                                    Remove
-                                                </AlertDialogAction>
-                                            </AlertDialogFooter>
-                                        </AlertDialogContent>
-                                    </AlertDialog>
-                                )}
-                                <span className="w-8 text-center text-muted-foreground">
-                                    {item.originalIndex}
-                                </span>
-                                <div className="flex items-center space-x-4">
-                                    {item.track.album.images[2]?.url ? (
-                                        <img
-                                            src={item.track.album.images[2].url}
-                                            alt={item.track.name}
-                                            className="w-10 h-10 rounded-md"
-                                        />
-                                    ) : (
-                                        <Music className="w-10 h-10 text-muted-foreground" />
-                                    )}
-                                    <div>
-                                        <p className="font-medium">
-                                            {item.track.name}
-                                        </p>
-                                        <p className="text-sm text-muted-foreground">
-                                            {item.track.artists
-                                                .map(
-                                                    (artist: any) => artist.name
-                                                )
-                                                .join(", ")}
-                                        </p>
-                                    </div>
-                                </div>
-                                <span className="text-sm text-muted-foreground truncate">
-                                    {item.track.album.name}
-                                </span>
-                                <span className="text-sm text-muted-foreground">
-                                    {formatDate(item.track.album.release_date)}
-                                </span>
-                                <span className="text-sm text-muted-foreground">
-                                    {item.audioFeatures?.tempo.toFixed(0)} BPM
-                                </span>
-                                <span className="text-sm text-muted-foreground">
-                                    {formatDuration(item.track.duration_ms)}
-                                </span>
-                            </div>
-                            <Separator />
-                        </div>
+                        <TrackItem
+                            key={item.track.id}
+                            item={item}
+                            isMultiSelectMode={isMultiSelectMode}
+                            selectedTracks={selectedTracks}
+                            toggleTrackSelection={toggleTrackSelection}
+                            deleteTrack={deleteTrack}
+                        />
                     ))}
                     {hasNextPage && (
                         <div ref={ref} className="p-4 text-center">
@@ -618,6 +453,14 @@ const TrackList: React.FC<TrackListProps> = ({ playlistId }) => {
                     )}
                 </div>
             </ScrollArea>
+            <SavePlaylistDialog
+                isOpen={isDialogOpen}
+                setIsOpen={setIsDialogOpen}
+                newPlaylistName={newPlaylistName}
+                setNewPlaylistName={setNewPlaylistName}
+                savePlaylist={savePlaylist}
+                isSaving={isSaving}
+            />
         </div>
     );
 };
