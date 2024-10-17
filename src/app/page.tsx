@@ -21,7 +21,7 @@ function HomeContent() {
         <div className="min-h-screen overflow-auto">
             <div className="flex flex-col">
                 {/* Hero Section */}
-                <section className="flex items-center justify-center bg-gradient-to-b from-background to-secondary py-16">
+                <section className="flex items-center justify-center bg-gradient-to-b from-background to-secondary min-h-screen">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center">
                         <div className="md:w-1/2 md:pr-12 mb-12 md:mb-0">
                             <h1 className="text-4xl font-bold tracking-tight sm:text-6xl mb-8">
@@ -50,53 +50,6 @@ function HomeContent() {
                                 />
                             </div>
                         </div>
-                    </div>
-                </section>
-
-                {/* Features Section */}
-                <section className="flex items-center bg-background py-16">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-                        <h2 className="text-3xl font-bold text-center mb-12">
-                            Key Features
-                        </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            <FeatureCard
-                                icon={<Music className="h-8 w-8" />}
-                                title="Smart Playlist Management"
-                                description="Easily organize and sort your playlists with intuitive tools."
-                            />
-                            <FeatureCard
-                                icon={<Shield className="h-8 w-8" />}
-                                title="Secure Integration"
-                                description="Safely connect with Spotify using industry-standard authentication."
-                            />
-                            <FeatureCard
-                                icon={<Star className="h-8 w-8" />}
-                                title="Personalized Experience"
-                                description="Get tailored recommendations based on your listening habits."
-                            />
-                        </div>
-                    </div>
-                </section>
-
-                {/* Call to Action Section */}
-                <section className="flex items-center bg-primary text-primary-foreground py-16">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                        <h2 className="text-3xl font-bold mb-6">
-                            Ready to Enhance Your Music Experience?
-                        </h2>
-                        <p className="text-xl mb-8">
-                            Join thousands of users who have transformed their
-                            playlist management.
-                        </p>
-                        <Button
-                            size="lg"
-                            variant="secondary"
-                            onClick={() => signIn("spotify")}
-                        >
-                            Get Started Now{" "}
-                            <ArrowRight className="ml-2 h-5 w-5" />
-                        </Button>
                     </div>
                 </section>
             </div>
