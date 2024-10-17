@@ -41,42 +41,7 @@ export const TrackItem: React.FC<TrackItemProps> = ({
 
     return (
         <div key={item.track.id}>
-            <div className="grid grid-cols-[auto,auto,2fr,1fr,6rem,6rem,4rem] gap-4 items-center p-2">
-                {isMultiSelectMode ? (
-                    <Checkbox
-                        checked={selectedTracks.has(item.track.uri)}
-                        onCheckedChange={() =>
-                            toggleTrackSelection(item.track.uri)
-                        }
-                    />
-                ) : (
-                    <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                                <Trash2 className="h-4 w-4" />
-                            </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                    Are you sure?
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    This will remove the track "
-                                    {item.track.name}" from the playlist.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                    onClick={() => deleteTrack(item.track.uri)}
-                                >
-                                    Remove
-                                </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
-                )}
+            <div className="grid grid-cols-[auto,2fr,1fr,6rem,6rem,4rem,auto] gap-4 items-center p-2">
                 <span className="w-8 text-center text-muted-foreground">
                     {item.originalIndex}
                 </span>
@@ -111,6 +76,42 @@ export const TrackItem: React.FC<TrackItemProps> = ({
                 <span className="text-sm text-muted-foreground">
                     {formatDuration(item.track.duration_ms)}
                 </span>
+                <div className="flex items-center space-x-2">
+                    {isMultiSelectMode && (
+                        <Checkbox
+                            checked={selectedTracks.has(item.track.uri)}
+                            onCheckedChange={() =>
+                                toggleTrackSelection(item.track.uri)
+                            }
+                        />
+                    )}
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                                <Trash2 className="h-4 w-4" />
+                            </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                    Are you sure?
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    This will remove the track "
+                                    {item.track.name}" from the playlist.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                    onClick={() => deleteTrack(item.track.uri)}
+                                >
+                                    Remove
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                </div>
             </div>
             <Separator />
         </div>
