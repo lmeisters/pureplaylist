@@ -50,6 +50,7 @@ const TrackList: React.FC<TrackListProps> = ({ playlistId }) => {
     const [newPlaylistName, setNewPlaylistName] = useState("");
     const [isSaving, setIsSaving] = useState(false);
     const [playlistDetails, setPlaylistDetails] = useState<any>(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     const { ref, inView } = useInView();
     const { data: session } = useSession();
@@ -239,6 +240,10 @@ const TrackList: React.FC<TrackListProps> = ({ playlistId }) => {
                     title: "Success",
                     description: `New playlist "${newPlaylistName}" created with the sorted tracks.`,
                 });
+
+                // Close the dialog and reset the new playlist name
+                setIsDialogOpen(false);
+                setNewPlaylistName("");
             } else {
                 // Update existing playlist
                 if (playlistDetails?.owner.id !== session?.user?.id) {
@@ -284,7 +289,7 @@ const TrackList: React.FC<TrackListProps> = ({ playlistId }) => {
             <div className="p-4 font-semibold border-b flex justify-between items-center">
                 <span>Playlist Tracks</span>
                 <div className="space-x-2">
-                    <Dialog>
+                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                         <DialogTrigger asChild>
                             <Button variant="outline" size="sm">
                                 Save as New Playlist
