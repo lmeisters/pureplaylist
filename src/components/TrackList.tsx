@@ -11,6 +11,7 @@ import {
     ChevronUp,
     ChevronDown,
     Save,
+    Trash2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
@@ -27,6 +28,19 @@ import {
 import { spotifyApi } from "@/lib/spotify";
 import { useSession } from "next-auth/react";
 import { useToast } from "@/hooks/use-toast";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 
 interface TrackListProps {
     playlistId: string;
@@ -51,6 +65,11 @@ const TrackList: React.FC<TrackListProps> = ({ playlistId }) => {
     const [isSaving, setIsSaving] = useState(false);
     const [playlistDetails, setPlaylistDetails] = useState<any>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [trackToDelete, setTrackToDelete] = useState<string | null>(null);
+    const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
+    const [selectedTracks, setSelectedTracks] = useState<Set<string>>(
+        new Set()
+    );
 
     const { ref, inView } = useInView();
     const { data: session } = useSession();
@@ -281,6 +300,114 @@ const TrackList: React.FC<TrackListProps> = ({ playlistId }) => {
         setIsSaving(false);
     };
 
+    const deleteTrack = async (trackUri: string) => {
+        if (!session?.accessToken) {
+            toast({
+                title: "Error",
+                description: "You must be logged in to delete tracks.",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${session.accessToken}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        tracks: [{ uri: trackUri }],
+                    }),
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Failed to delete track");
+            }
+
+            toast({
+                title: "Success",
+                description: "Track removed from the playlist.",
+            });
+
+            // Refetch the playlist tracks
+            fetchNextPage();
+        } catch (error) {
+            console.error("Error deleting track:", error);
+            toast({
+                title: "Error",
+                description: "Failed to remove the track. Please try again.",
+                variant: "destructive",
+            });
+        }
+        setTrackToDelete(null);
+    };
+
+    const toggleTrackSelection = (trackUri: string) => {
+        setSelectedTracks((prev) => {
+            const newSet = new Set(prev);
+            if (newSet.has(trackUri)) {
+                newSet.delete(trackUri);
+            } else {
+                newSet.add(trackUri);
+            }
+            return newSet;
+        });
+    };
+
+    const deleteSelectedTracks = async () => {
+        if (!session?.accessToken) {
+            toast({
+                title: "Error",
+                description: "You must be logged in to delete tracks.",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${session.accessToken}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        tracks: Array.from(selectedTracks).map((uri) => ({
+                            uri,
+                        })),
+                    }),
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Failed to delete tracks");
+            }
+
+            toast({
+                title: "Success",
+                description: `${selectedTracks.size} track(s) removed from the playlist.`,
+            });
+
+            // Clear selection and refetch tracks
+            setSelectedTracks(new Set());
+            fetchNextPage();
+        } catch (error) {
+            console.error("Error deleting tracks:", error);
+            toast({
+                title: "Error",
+                description: "Failed to remove the tracks. Please try again.",
+                variant: "destructive",
+            });
+        }
+    };
+
     if (isLoading) return <div className="p-4">Loading tracks...</div>;
     if (error) return <div className="p-4">Error loading tracks</div>;
 
@@ -288,7 +415,45 @@ const TrackList: React.FC<TrackListProps> = ({ playlistId }) => {
         <div className="h-full flex flex-col">
             <div className="p-4 font-semibold border-b flex justify-between items-center">
                 <span>Playlist Tracks</span>
-                <div className="space-x-2">
+                <div className="space-x-2 flex items-center">
+                    <div className="flex items-center space-x-2">
+                        <Switch
+                            checked={isMultiSelectMode}
+                            onCheckedChange={setIsMultiSelectMode}
+                        />
+                        <span>Multi-select</span>
+                    </div>
+                    {isMultiSelectMode && selectedTracks.size > 0 && (
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="destructive" size="sm">
+                                    <Trash2 className="w-4 h-4 mr-2" />
+                                    Delete Selected ({selectedTracks.size})
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                        Are you sure?
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This will remove {selectedTracks.size}{" "}
+                                        selected track(s) from the playlist.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>
+                                        Cancel
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction
+                                        onClick={deleteSelectedTracks}
+                                    >
+                                        Delete
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    )}
                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                         <DialogTrigger asChild>
                             <Button variant="outline" size="sm">
@@ -330,7 +495,8 @@ const TrackList: React.FC<TrackListProps> = ({ playlistId }) => {
                     </Button>
                 </div>
             </div>
-            <div className="p-2 font-semibold border-b grid grid-cols-[auto,2fr,1fr,6rem,6rem,4rem] gap-4 items-center">
+            <div className="p-2 font-semibold border-b grid grid-cols-[auto,auto,2fr,1fr,6rem,6rem,4rem] gap-4 items-center">
+                <span></span>
                 <SortButton field="number">#</SortButton>
                 <SortButton field="title">Title</SortButton>
                 <SortButton field="album">Album</SortButton>
@@ -348,7 +514,59 @@ const TrackList: React.FC<TrackListProps> = ({ playlistId }) => {
                 <div className="pb-2">
                     {sortedTracks.map((item: any) => (
                         <div key={item.track.id}>
-                            <div className="grid grid-cols-[auto,2fr,1fr,6rem,6rem,4rem] gap-4 items-center p-2">
+                            <div className="grid grid-cols-[auto,auto,2fr,1fr,6rem,6rem,4rem] gap-4 items-center p-2">
+                                {isMultiSelectMode ? (
+                                    <Checkbox
+                                        checked={selectedTracks.has(
+                                            item.track.uri
+                                        )}
+                                        onCheckedChange={() =>
+                                            toggleTrackSelection(item.track.uri)
+                                        }
+                                    />
+                                ) : (
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() =>
+                                                    setTrackToDelete(
+                                                        item.track.uri
+                                                    )
+                                                }
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>
+                                                    Are you sure?
+                                                </AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    This will remove the track "
+                                                    {item.track.name}" from the
+                                                    playlist.
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>
+                                                    Cancel
+                                                </AlertDialogCancel>
+                                                <AlertDialogAction
+                                                    onClick={() =>
+                                                        deleteTrack(
+                                                            item.track.uri
+                                                        )
+                                                    }
+                                                >
+                                                    Remove
+                                                </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
+                                )}
                                 <span className="w-8 text-center text-muted-foreground">
                                     {item.originalIndex}
                                 </span>
