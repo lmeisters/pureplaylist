@@ -5,7 +5,7 @@ import { usePlaylistsQuery } from "@/hooks/usePlaylistQuery";
 import TrackList from "@/components/TrackList";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Music, Filter } from "lucide-react";
+import { Music, Filter, Star } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +25,30 @@ const PlaylistManager = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [sortOption, setSortOption] = useState<SortOption>("nameAsc");
     const searchInputRef = useRef<HTMLInputElement>(null);
+    const [favorites, setFavorites] = useState<Set<string>>(new Set());
+
+    useEffect(() => {
+        const storedFavorites = localStorage.getItem("favoritePlaylistIds");
+        if (storedFavorites) {
+            setFavorites(new Set(JSON.parse(storedFavorites)));
+        }
+    }, []);
+
+    const toggleFavorite = (playlistId: string) => {
+        setFavorites((prevFavorites) => {
+            const newFavorites = new Set(prevFavorites);
+            if (newFavorites.has(playlistId)) {
+                newFavorites.delete(playlistId);
+            } else {
+                newFavorites.add(playlistId);
+            }
+            localStorage.setItem(
+                "favoritePlaylistIds",
+                JSON.stringify(Array.from(newFavorites))
+            );
+            return newFavorites;
+        });
+    };
 
     const filteredAndSortedPlaylists = useMemo(() => {
         let result =
@@ -32,23 +56,27 @@ const PlaylistManager = () => {
                 playlist.name.toLowerCase().includes(searchTerm.toLowerCase())
             ) || [];
 
-        switch (sortOption) {
-            case "nameAsc":
-                result.sort((a, b) => a.name.localeCompare(b.name));
-                break;
-            case "nameDesc":
-                result.sort((a, b) => b.name.localeCompare(a.name));
-                break;
-            case "sizeAsc":
-                result.sort((a, b) => a.tracks.total - b.tracks.total);
-                break;
-            case "sizeDesc":
-                result.sort((a, b) => b.tracks.total - a.tracks.total);
-                break;
-        }
+        // Sort by favorite status first, then apply the selected sort option
+        result.sort((a, b) => {
+            if (favorites.has(a.id) && !favorites.has(b.id)) return -1;
+            if (!favorites.has(a.id) && favorites.has(b.id)) return 1;
+
+            switch (sortOption) {
+                case "nameAsc":
+                    return a.name.localeCompare(b.name);
+                case "nameDesc":
+                    return b.name.localeCompare(a.name);
+                case "sizeAsc":
+                    return a.tracks.total - b.tracks.total;
+                case "sizeDesc":
+                    return b.tracks.total - a.tracks.total;
+                default:
+                    return 0;
+            }
+        });
 
         return result;
-    }, [playlists, searchTerm, sortOption]);
+    }, [playlists, searchTerm, sortOption, favorites]);
 
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -142,7 +170,7 @@ const PlaylistManager = () => {
                                 ) : (
                                     <Music className="w-10 h-10 text-muted-foreground" />
                                 )}
-                                <div>
+                                <div className="flex-grow">
                                     <p className="font-medium">
                                         {playlist.name}
                                     </p>
@@ -150,6 +178,22 @@ const PlaylistManager = () => {
                                         {playlist.tracks.total} tracks
                                     </p>
                                 </div>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        toggleFavorite(playlist.id);
+                                    }}
+                                >
+                                    <Star
+                                        className={`h-4 w-4 ${
+                                            favorites.has(playlist.id)
+                                                ? "text-yellow-400 fill-yellow-400"
+                                                : "text-muted-foreground"
+                                        }`}
+                                    />
+                                </Button>
                             </div>
                             <Separator />
                         </div>
