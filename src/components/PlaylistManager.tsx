@@ -14,8 +14,9 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useQueryClient } from "@tanstack/react-query";
 
-type SortOption = "nameAsc" | "nameDesc" | "sizeAsc" | "sizeDesc";
+type SortOption = "default" | "nameAsc" | "nameDesc" | "sizeAsc" | "sizeDesc";
 
 const PlaylistManager = () => {
     const { data: playlists, isLoading, error } = usePlaylistsQuery();
@@ -23,9 +24,10 @@ const PlaylistManager = () => {
         null
     );
     const [searchTerm, setSearchTerm] = useState("");
-    const [sortOption, setSortOption] = useState<SortOption>("nameAsc");
+    const [sortOption, setSortOption] = useState<SortOption>("default");
     const searchInputRef = useRef<HTMLInputElement>(null);
     const [favorites, setFavorites] = useState<Set<string>>(new Set());
+    const queryClient = useQueryClient();
 
     useEffect(() => {
         const storedFavorites = localStorage.getItem("favoritePlaylistIds");
@@ -62,6 +64,9 @@ const PlaylistManager = () => {
             if (!favorites.has(a.id) && favorites.has(b.id)) return 1;
 
             switch (sortOption) {
+                case "default":
+                    // Assuming 'createdAt' is a Date object or timestamp
+                    return (b.createdAt as any) - (a.createdAt as any);
                 case "nameAsc":
                     return a.name.localeCompare(b.name);
                 case "nameDesc":
@@ -89,6 +94,11 @@ const PlaylistManager = () => {
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, []);
+
+    const handlePlaylistUpdate = () => {
+        // Refetch the playlists data
+        queryClient.invalidateQueries(["playlists"]);
+    };
 
     if (isLoading)
         return (
@@ -125,6 +135,11 @@ const PlaylistManager = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
                             <DropdownMenuItem
+                                onClick={() => setSortOption("default")}
+                            >
+                                Default Order
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
                                 onClick={() => setSortOption("nameAsc")}
                             >
                                 Name (A-Z)
@@ -146,7 +161,7 @@ const PlaylistManager = () => {
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
-                    <kbd className="absolute right-20 top-1/2 transform -translate-y-1/2 pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+                    <kbd className="absolute right-20 top-1/2 transform -translate-y-1/2 pointer-events-none inline-flex h-5 select-none items-center rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
                         <span className="text-xs">Ctrl+K</span>
                     </kbd>
                 </div>
@@ -202,7 +217,10 @@ const PlaylistManager = () => {
             </div>
             <div className="flex-1 h-full overflow-hidden">
                 {selectedPlaylist ? (
-                    <TrackList playlistId={selectedPlaylist} />
+                    <TrackList
+                        playlistId={selectedPlaylist}
+                        onPlaylistUpdate={handlePlaylistUpdate}
+                    />
                 ) : (
                     <div className="flex items-center justify-center h-full text-muted-foreground">
                         <p>Select a playlist to view tracks</p>

@@ -11,15 +11,21 @@ import { TrackListHeader } from "./TrackListHeader";
 import { TrackItem } from "./TrackItem";
 import { SavePlaylistDialog } from "./SavePlaylistDialog";
 import { SortButton } from "./SortButton";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface TrackListProps {
     playlistId: string;
+    onPlaylistUpdate: () => void;
 }
 
 type SortField = "number" | "title" | "album" | "date" | "bpm" | "duration";
 type SortOrder = "asc" | "desc";
 
-const TrackList: React.FC<TrackListProps> = ({ playlistId }) => {
+const TrackList: React.FC<TrackListProps> = ({
+    playlistId,
+    onPlaylistUpdate,
+}) => {
+    const queryClient = useQueryClient();
     const {
         data,
         fetchNextPage,
@@ -229,11 +235,25 @@ const TrackList: React.FC<TrackListProps> = ({ playlistId }) => {
                     }
                 );
 
+                // Update the local query cache
+                queryClient.setQueryData(
+                    ["playlistTracks", playlistId],
+                    (oldData: any) => ({
+                        ...oldData,
+                        pages: [
+                            { items: sortedTracks.map((track) => ({ track })) },
+                        ],
+                    })
+                );
+
                 toast({
                     title: "Success",
                     description: "Playlist updated with the new track order.",
                 });
             }
+
+            // Call onPlaylistUpdate after successful save
+            onPlaylistUpdate();
         } catch (error: any) {
             console.error("Error saving playlist:", error);
             toast({
@@ -281,8 +301,25 @@ const TrackList: React.FC<TrackListProps> = ({ playlistId }) => {
                 description: "Track removed from the playlist.",
             });
 
-            // Refetch the playlist tracks
-            fetchNextPage();
+            // Update the local state
+            const updatedTracks = tracks.filter(
+                (item) => item.track.uri !== trackUri
+            );
+            queryClient.setQueryData(
+                ["playlistTracks", playlistId],
+                (oldData: any) => ({
+                    ...oldData,
+                    pages: oldData.pages.map((page: any) => ({
+                        ...page,
+                        items: page.items.filter(
+                            (item: any) => item.track.uri !== trackUri
+                        ),
+                    })),
+                })
+            );
+
+            // Call onPlaylistUpdate after successful deletion
+            onPlaylistUpdate();
         } catch (error) {
             console.error("Error deleting track:", error);
             toast({
