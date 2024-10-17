@@ -184,15 +184,56 @@ const TrackList: React.FC<TrackListProps> = ({ playlistId }) => {
                     return;
                 }
 
-                const response = await spotifyApi.post("/users/me/playlists", {
-                    name: newPlaylistName,
-                    public: false,
-                });
+                console.log("Creating new playlist...");
+                const response = await fetch(
+                    "https://api.spotify.com/v1/me/playlists",
+                    {
+                        method: "POST",
+                        headers: {
+                            Authorization: `Bearer ${session.accessToken}`,
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            name: newPlaylistName,
+                            description: "Created with PurePlaylist",
+                            public: false,
+                        }),
+                    }
+                );
 
-                const newPlaylistId = response.data.id;
-                await spotifyApi.post(`/playlists/${newPlaylistId}/tracks`, {
-                    uris: trackUris,
-                });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(
+                        errorData.error?.message || "Failed to create playlist"
+                    );
+                }
+
+                const data = await response.json();
+                console.log("New playlist created:", data);
+
+                const newPlaylistId = data.id;
+                console.log("Adding tracks to new playlist...");
+                const addTracksResponse = await fetch(
+                    `https://api.spotify.com/v1/playlists/${newPlaylistId}/tracks`,
+                    {
+                        method: "POST",
+                        headers: {
+                            Authorization: `Bearer ${session.accessToken}`,
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ uris: trackUris }),
+                    }
+                );
+
+                if (!addTracksResponse.ok) {
+                    const errorData = await addTracksResponse.json();
+                    throw new Error(
+                        errorData.error?.message ||
+                            "Failed to add tracks to playlist"
+                    );
+                }
+
+                console.log("Tracks added to new playlist");
 
                 toast({
                     title: "Success",
@@ -205,9 +246,17 @@ const TrackList: React.FC<TrackListProps> = ({ playlistId }) => {
                         "You don't have permission to modify this playlist."
                     );
                 }
-                await spotifyApi.put(`/playlists/${playlistId}/tracks`, {
-                    uris: trackUris,
-                });
+                await spotifyApi.put(
+                    `/playlists/${playlistId}/tracks`,
+                    {
+                        uris: trackUris,
+                    },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${session.accessToken}`,
+                        },
+                    }
+                );
 
                 toast({
                     title: "Success",
