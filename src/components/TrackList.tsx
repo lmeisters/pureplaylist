@@ -2,30 +2,15 @@
 
 import { usePlaylistTracksQuery } from "@/hooks/usePlaylistTracksQuery";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
-import { Button } from "@/components/ui/button";
 import { spotifyApi } from "@/lib/spotify";
 import { useSession } from "next-auth/react";
 import { useToast } from "@/hooks/use-toast";
-import { Switch } from "@/components/ui/switch";
 import { TrackListHeader } from "./TrackListHeader";
 import { TrackItem } from "./TrackItem";
 import { SavePlaylistDialog } from "./SavePlaylistDialog";
 import { SortButton } from "./SortButton";
-import {
-    AlertDialog,
-    AlertDialogTrigger,
-    AlertDialogContent,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogCancel,
-    AlertDialogAction,
-} from "@/components/ui/alert-dialog";
-import { Trash2 } from "lucide-react";
 
 interface TrackListProps {
     playlistId: string;
@@ -86,15 +71,15 @@ const TrackList: React.FC<TrackListProps> = ({ playlistId }) => {
             }))
         ) || [];
 
-    function formatDuration(ms: number): string {
-        const minutes = Math.floor(ms / 60000);
-        const seconds = ((ms % 60000) / 1000).toFixed(0);
-        return `${minutes}:${Number(seconds) < 10 ? "0" : ""}${seconds}`;
-    }
+    // function formatDuration(ms: number): string {
+    //     const minutes = Math.floor(ms / 60000);
+    //     const seconds = ((ms % 60000) / 1000).toFixed(0);
+    //     return `${minutes}:${Number(seconds) < 10 ? "0" : ""}${seconds}`;
+    // }
 
-    function formatDate(dateString: string): string {
-        return new Date(dateString).toLocaleDateString();
-    }
+    // function formatDate(dateString: string): string {
+    //     return new Date(dateString).toLocaleDateString();
+    // }
 
     const sortedTracks = [...tracks].sort((a, b) => {
         let aValue, bValue;

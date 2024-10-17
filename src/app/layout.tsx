@@ -28,7 +28,7 @@ export default function RootLayout({
                     <QueryClientProvider client={queryClient}>
                         <div className="flex flex-col h-screen overflow-hidden">
                             <Header />
-                            <main className="flex-1 overflow-hidden ">
+                            <main className="flex-1 overflow-auto">
                                 <div className="w-full h-full px-4">
                                     {children}
                                 </div>
