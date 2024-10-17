@@ -1,4 +1,4 @@
-import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { spotifyApi, setAccessToken } from '@/lib/spotify';
 import { useSession } from 'next-auth/react';
 
@@ -15,13 +15,27 @@ export const usePlaylistTracksQuery = (playlistId: string) => {
     queryFn: async ({ pageParam = 0 }) => {
       if (session?.accessToken) {
         setAccessToken(session.accessToken as string);
-        const response = await spotifyApi.get(`/playlists/${playlistId}/tracks`, {
+        const tracksResponse = await spotifyApi.get(`/playlists/${playlistId}/tracks`, {
           params: {
             offset: pageParam,
             limit: 50 // Amount of tracks to fetch per page
           }
         });
-        return response.data;
+
+        // Fetch audio features for the tracks
+        const trackIds = tracksResponse.data.items.map((item: any) => item.track.id).join(',');
+        const audioFeaturesResponse = await spotifyApi.get(`/audio-features?ids=${trackIds}`);
+
+        // Merge track data with audio features
+        const mergedItems = tracksResponse.data.items.map((item: any, index: number) => ({
+          ...item,
+          audioFeatures: audioFeaturesResponse.data.audio_features[index]
+        }));
+
+        return {
+          ...tracksResponse.data,
+          items: mergedItems
+        };
       }
       return { items: [], next: null };
     },
