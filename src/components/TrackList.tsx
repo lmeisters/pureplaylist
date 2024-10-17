@@ -12,7 +12,6 @@ import { TrackItem } from "./TrackItem";
 import { SavePlaylistDialog } from "./SavePlaylistDialog";
 import { SortButton } from "./SortButton";
 import { useQueryClient } from "@tanstack/react-query";
-import { Trash2 } from "lucide-react";
 
 interface TrackListProps {
     playlistId: string;
@@ -407,7 +406,8 @@ const TrackList: React.FC<TrackListProps> = ({
                 savePlaylist={savePlaylist}
                 isSaving={isSaving}
             />
-            <div className="p-2 font-semibold border-b grid grid-cols-[auto,2fr,1fr,6rem,6rem,4rem,1.5rem] gap-4 items-center">
+            <div className="p-2 font-semibold border-b grid grid-cols-[auto,auto,2fr,1fr,6rem,6rem,4rem] gap-4 items-center">
+                <span></span>
                 <SortButton
                     field="number"
                     sortField={sortField}
@@ -453,9 +453,6 @@ const TrackList: React.FC<TrackListProps> = ({
                     toggleSort={toggleSort}
                     icon="clock"
                 />
-                <span>
-                    <Trash2 className="h-4 w-4" />
-                </span>
             </div>
             <ScrollArea className="flex-grow">
                 <div className="pb-2">
