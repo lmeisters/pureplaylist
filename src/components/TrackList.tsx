@@ -10,10 +10,23 @@ import {
     Clock,
     ChevronUp,
     ChevronDown,
+    Save,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import { spotifyApi } from "@/lib/spotify";
+import { useSession } from "next-auth/react";
+import { useToast } from "@/hooks/use-toast";
 
 interface TrackListProps {
     playlistId: string;
@@ -34,8 +47,13 @@ const TrackList: React.FC<TrackListProps> = ({ playlistId }) => {
 
     const [sortField, setSortField] = useState<SortField>("number");
     const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
+    const [newPlaylistName, setNewPlaylistName] = useState("");
+    const [isSaving, setIsSaving] = useState(false);
+    const [playlistDetails, setPlaylistDetails] = useState<any>(null);
 
     const { ref, inView } = useInView();
+    const { data: session } = useSession();
+    const { toast } = useToast();
 
     useEffect(() => {
         if (inView && hasNextPage) {
@@ -49,8 +67,11 @@ const TrackList: React.FC<TrackListProps> = ({ playlistId }) => {
         setSortOrder("asc");
     }, [playlistId]);
 
-    if (isLoading) return <div className="p-4">Loading tracks...</div>;
-    if (error) return <div className="p-4">Error loading tracks</div>;
+    useEffect(() => {
+        if (data?.pages[0]?.playlistDetails) {
+            setPlaylistDetails(data.pages[0].playlistDetails);
+        }
+    }, [data]);
 
     const tracks =
         data?.pages.flatMap((page, pageIndex) =>
@@ -137,9 +158,124 @@ const TrackList: React.FC<TrackListProps> = ({ playlistId }) => {
         </Button>
     );
 
+    const savePlaylist = async (createNew: boolean) => {
+        if (!session?.accessToken) {
+            toast({
+                title: "Error",
+                description: "You must be logged in to save playlists.",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        setIsSaving(true);
+        try {
+            const trackUris = sortedTracks.map((item) => item.track.uri);
+
+            if (createNew) {
+                if (!newPlaylistName) {
+                    toast({
+                        title: "Error",
+                        description:
+                            "Please enter a name for the new playlist.",
+                        variant: "destructive",
+                    });
+                    setIsSaving(false);
+                    return;
+                }
+
+                const response = await spotifyApi.post("/users/me/playlists", {
+                    name: newPlaylistName,
+                    public: false,
+                });
+
+                const newPlaylistId = response.data.id;
+                await spotifyApi.post(`/playlists/${newPlaylistId}/tracks`, {
+                    uris: trackUris,
+                });
+
+                toast({
+                    title: "Success",
+                    description: `New playlist "${newPlaylistName}" created with the sorted tracks.`,
+                });
+            } else {
+                // Update existing playlist
+                if (playlistDetails?.owner.id !== session?.user?.id) {
+                    throw new Error(
+                        "You don't have permission to modify this playlist."
+                    );
+                }
+                await spotifyApi.put(`/playlists/${playlistId}/tracks`, {
+                    uris: trackUris,
+                });
+
+                toast({
+                    title: "Success",
+                    description: "Playlist updated with the new track order.",
+                });
+            }
+        } catch (error: any) {
+            console.error("Error saving playlist:", error);
+            toast({
+                title: "Error",
+                description:
+                    error.message ||
+                    "Failed to save the playlist. Please try again.",
+                variant: "destructive",
+            });
+        }
+        setIsSaving(false);
+    };
+
+    if (isLoading) return <div className="p-4">Loading tracks...</div>;
+    if (error) return <div className="p-4">Error loading tracks</div>;
+
     return (
         <div className="h-full flex flex-col">
-            <div className="p-4 font-semibold border-b">Playlist Tracks</div>
+            <div className="p-4 font-semibold border-b flex justify-between items-center">
+                <span>Playlist Tracks</span>
+                <div className="space-x-2">
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button variant="outline" size="sm">
+                                Save as New Playlist
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Create New Playlist</DialogTitle>
+                                <DialogDescription>
+                                    Enter a name for your new playlist. This
+                                    will create a new playlist with the current
+                                    track order.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <Input
+                                placeholder="Enter new playlist name"
+                                value={newPlaylistName}
+                                onChange={(e) =>
+                                    setNewPlaylistName(e.target.value)
+                                }
+                            />
+                            <Button
+                                onClick={() => savePlaylist(true)}
+                                disabled={isSaving}
+                            >
+                                {isSaving ? "Saving..." : "Create and Save"}
+                            </Button>
+                        </DialogContent>
+                    </Dialog>
+                    <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => savePlaylist(false)}
+                        disabled={isSaving}
+                    >
+                        <Save className="w-4 h-4 mr-2" />
+                        {isSaving ? "Saving..." : "Update Current Playlist"}
+                    </Button>
+                </div>
+            </div>
             <div className="p-2 font-semibold border-b grid grid-cols-[auto,2fr,1fr,6rem,6rem,4rem] gap-4 items-center">
                 <SortButton field="number">#</SortButton>
                 <SortButton field="title">Title</SortButton>

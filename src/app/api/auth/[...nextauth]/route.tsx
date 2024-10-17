@@ -15,7 +15,7 @@ const handler = NextAuth({
             clientSecret: process.env.SPOTIFY_CLIENT_SECRET!,
             authorization: {
                 params: {
-                    scope: "user-read-email playlist-read-private user-library-read",
+                    scope: "user-read-email playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public",
                 },
             },
         }),
