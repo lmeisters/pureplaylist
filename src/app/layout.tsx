@@ -25,10 +25,10 @@ export default function RootLayout({
             <body className={inter.className}>
                 <Providers>
                     <QueryClientProvider client={queryClient}>
-                        <div className="min-h-screen bg-gray-100">
+                        <div className="flex flex-col h-screen overflow-hidden">
                             <Header />
-                            <main>
-                                <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+                            <main className="flex-1 overflow-hidden ">
+                                <div className="w-full h-full px-4">
                                     {children}
                                 </div>
                             </main>

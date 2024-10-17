@@ -18,7 +18,7 @@ export const usePlaylistTracksQuery = (playlistId: string) => {
         const response = await spotifyApi.get(`/playlists/${playlistId}/tracks`, {
           params: {
             offset: pageParam,
-            limit: 50 // You can adjust this value
+            limit: 50 // Amount of tracks to fetch per page
           }
         });
         return response.data;

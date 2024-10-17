@@ -1,34 +1,35 @@
 "use client";
 
 import { useSession, signIn, signOut } from "next-auth/react";
+import { Button } from "@/components/ui/button";
 
-const Header = () => {
+function Header() {
     const { data: session } = useSession();
 
     return (
-        <header className="bg-white shadow">
-            <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-                <h1 className="text-3xl font-bold text-gray-900">
-                    Spotify Playlist Filter
-                </h1>
+        <header className="bg-background border-b">
+            <div className="w-full px-6 sm:px-8 flex justify-between items-center py-2">
+                <h1 className="text-xl font-semibold">PurePlaylist</h1>
                 {session ? (
-                    <button
+                    <Button
+                        variant="destructive"
+                        size="sm"
                         onClick={() => signOut()}
-                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                     >
                         Sign Out
-                    </button>
+                    </Button>
                 ) : (
-                    <button
+                    <Button
+                        variant="default"
+                        size="sm"
                         onClick={() => signIn("spotify")}
-                        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
                     >
-                        Sign In with Spotify
-                    </button>
+                        Sign In
+                    </Button>
                 )}
             </div>
         </header>
     );
-};
+}
 
 export default Header;
