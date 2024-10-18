@@ -65,7 +65,6 @@ const PlaylistManager = () => {
 
             switch (sortOption) {
                 case "default":
-                    // Assuming 'createdAt' is a Date object or timestamp
                     return (b.createdAt as any) - (a.createdAt as any);
                 case "nameAsc":
                     return a.name.localeCompare(b.name);
@@ -166,15 +165,23 @@ const PlaylistManager = () => {
                     </kbd>
                 </div>
                 <ScrollArea className="flex-grow">
-                    <div className="pb-16">
+                    <div className="pb-16 p-3">
                         {filteredAndSortedPlaylists?.map((playlist: any) => (
-                            <div key={playlist.id}>
+                            <div
+                                key={playlist.id}
+                                className="rounded-lg overflow-hidden"
+                            >
                                 <div
-                                    className={`flex items-center space-x-4 px-4 py-2 cursor-pointer ${
-                                        selectedPlaylist === playlist.id
-                                            ? "bg-accent rounded-md"
-                                            : ""
-                                    }`}
+                                    className={`flex items-center space-x-4 px-4 py-3 cursor-pointer 
+                        transform transition-all duration-200 ease-out
+                        border border-border/50 rounded-lg
+                        shadow-[inset_0_-2px_4px_rgba(0,0,0,0.1)]
+                        hover:scale-[1.02] hover:-translate-y-1 
+                        ${
+                            selectedPlaylist === playlist.id
+                                ? "bg-accent shadow-md scale-[1.02] -translate-y-1"
+                                : "hover:bg-accent/10 bg-background"
+                        }`}
                                     onClick={() =>
                                         setSelectedPlaylist(playlist.id)
                                     }
@@ -183,13 +190,15 @@ const PlaylistManager = () => {
                                         <img
                                             src={playlist.images[0].url}
                                             alt={playlist.name}
-                                            className="w-10 h-10 rounded-lg"
+                                            className="w-10 h-10 rounded-lg shadow-sm"
                                         />
                                     ) : (
-                                        <Music className="w-10 h-10 text-muted-foreground" />
+                                        <div className="w-10 h-10 rounded-lg bg-muted shadow-sm flex items-center justify-center">
+                                            <Music className="w-6 h-6 text-muted-foreground" />
+                                        </div>
                                     )}
-                                    <div className="flex-grow">
-                                        <p className="font-medium">
+                                    <div className="flex-grow min-w-0">
+                                        <p className="font-medium truncate">
                                             {playlist.name}
                                         </p>
                                         <p className="text-sm text-muted-foreground">
@@ -213,7 +222,6 @@ const PlaylistManager = () => {
                                         />
                                     </Button>
                                 </div>
-                                <Separator />
                             </div>
                         ))}
                     </div>
