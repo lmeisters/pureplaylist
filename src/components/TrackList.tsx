@@ -415,19 +415,41 @@ const TrackList: React.FC<TrackListProps> = ({
                 ? track.track.album.genres.join(" ").toLowerCase()
                 : "";
 
-            const matchesTitleKeyword =
-                criteria.titleKeywords.length === 0 ||
-                criteria.titleKeywords.some((keyword) =>
-                    title.includes(keyword.toLowerCase())
-                );
-            const matchesGenre =
-                criteria.genres.length === 0 ||
-                criteria.genres.some((g) => genre.includes(g.toLowerCase()));
-            const matchesArtist =
-                criteria.artists.length === 0 ||
-                criteria.artists.some((a) => artist.includes(a.toLowerCase()));
+            // Check each filter independently
+            if (criteria.titleKeywords.length > 0) {
+                if (
+                    criteria.titleKeywords.some((keyword) =>
+                        title.includes(keyword.toLowerCase())
+                    )
+                ) {
+                    return true;
+                }
+            }
 
-            return matchesTitleKeyword && matchesGenre && matchesArtist;
+            if (criteria.genres.length > 0) {
+                if (
+                    criteria.genres.some((g) => genre.includes(g.toLowerCase()))
+                ) {
+                    return true;
+                }
+            }
+
+            if (criteria.artists.length > 0) {
+                if (
+                    criteria.artists.some((a) =>
+                        artist.includes(a.toLowerCase())
+                    )
+                ) {
+                    return true;
+                }
+            }
+
+            // If no filters are applied, include all tracks
+            return (
+                criteria.titleKeywords.length === 0 &&
+                criteria.genres.length === 0 &&
+                criteria.artists.length === 0
+            );
         });
 
         setFilteredTracks(filtered);

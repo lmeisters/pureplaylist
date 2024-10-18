@@ -80,8 +80,9 @@ export function FilterTab({
                 <DialogHeader>
                     <DialogTitle>Filter Tracks</DialogTitle>
                     <DialogDescription>
-                        Enter keywords to filter your playlist tracks. Separate
-                        multiple entries with commas.
+                        Enter keywords to filter your playlist tracks. You can
+                        use any combination of title keywords, genres, and
+                        artists.
                     </DialogDescription>
                 </DialogHeader>
 
