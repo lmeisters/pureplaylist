@@ -16,6 +16,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { FilterTab, FilterCriteria } from "./FilterTab";
 import { Button } from "@/components/ui/button";
 import { Filter } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface TrackListProps {
     playlistId: string;
@@ -386,14 +387,47 @@ const TrackList: React.FC<TrackListProps> = ({
                 throw new Error("Failed to delete tracks");
             }
 
+            // Update local state
+            const updatedTracks = sortedAndFilteredTracks.filter(
+                (track) => !selectedTracks.has(track.track.uri)
+            );
+
+            // Update query cache
+            queryClient.setQueryData(
+                ["playlistTracks", playlistId],
+                (oldData: any) => ({
+                    ...oldData,
+                    pages: oldData.pages.map((page: any) => ({
+                        ...page,
+                        items: page.items.filter(
+                            (item: any) => !selectedTracks.has(item.track.uri)
+                        ),
+                    })),
+                })
+            );
+
+            // Clear selection
+            setSelectedTracks(new Set());
+
+            // Update filtered tracks if necessary
+            if (filteredTracks.length > 0) {
+                setFilteredTracks(
+                    filteredTracks.filter(
+                        (track) => !selectedTracks.has(track.track.uri)
+                    )
+                );
+            }
+
             toast({
                 title: "Success",
                 description: `${selectedTracks.size} track(s) removed from the playlist.`,
             });
 
-            // Clear selection and refetch tracks
-            setSelectedTracks(new Set());
-            fetchNextPage();
+            // Call onPlaylistUpdate to reflect changes in the parent component
+            onPlaylistUpdate();
+
+            // Optionally, refetch the data to ensure everything is in sync
+            queryClient.invalidateQueries(["playlistTracks", playlistId]);
         } catch (error) {
             console.error("Error deleting tracks:", error);
             toast({
@@ -545,7 +579,7 @@ const TrackList: React.FC<TrackListProps> = ({
                 onClearFilters={clearFilters}
                 initialFilters={filterCriteria}
             />
-            <div className="p-2 font-semibold border-b grid grid-cols-[auto,auto,2fr,1fr,6rem,6rem,4rem] gap-4 items-center">
+            <div className="p-2 font-semibold border-b grid grid-cols-[auto,auto,2fr,1fr,6rem,6rem,4rem,auto] gap-4 items-center">
                 <span></span>
                 <SortButton
                     field="number"
@@ -592,6 +626,15 @@ const TrackList: React.FC<TrackListProps> = ({
                     toggleSort={toggleSort}
                     icon="clock"
                 />
+                <div className="flex items-center justify-center">
+                    <Checkbox
+                        id="multi-select-mode"
+                        checked={isMultiSelectMode}
+                        onCheckedChange={(checked) =>
+                            setIsMultiSelectMode(checked as boolean)
+                        }
+                    />
+                </div>
             </div>
             <ScrollArea className="flex-grow">
                 <div className="pb-16">

@@ -12,6 +12,7 @@ import {
     AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { Trash2, Save, Filter } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface TrackListHeaderProps {
     isMultiSelectMode: boolean;
@@ -95,13 +96,6 @@ export const TrackListHeader: React.FC<TrackListHeaderProps> = ({
                             </AlertDialog>
                         </>
                     )}
-                </div>
-                <div className="flex items-center space-x-2">
-                    <Switch
-                        checked={isMultiSelectMode}
-                        onCheckedChange={setIsMultiSelectMode}
-                    />
-                    <span>Multi-select</span>
                 </div>
                 {isMultiSelectMode && selectedTracks.size > 0 && (
                     <AlertDialog>
