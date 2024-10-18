@@ -79,13 +79,18 @@ export function FilterTab({
                 <DialogHeader>
                     <DialogTitle>Filter Tracks</DialogTitle>
                 </DialogHeader>
+
+                <p className="text-sm text-gray-500">
+                    Separate all entries with commas.
+                </p>
+
                 <div className="space-y-4 py-4">
                     <div>
                         <label
                             htmlFor="titleKeywords"
                             className="block text-sm font-medium text-gray-700"
                         >
-                            Title Keywords (comma-separated)
+                            Title Keywords
                         </label>
                         <Input
                             id="titleKeywords"
@@ -94,7 +99,7 @@ export function FilterTab({
                                 setTitleKeywordInput(e.target.value)
                             }
                             onKeyDown={handleKeyDown}
-                            placeholder="e.g., live, instrumental"
+                            placeholder="live, instrumental"
                         />
                     </div>
                     <div>
@@ -102,14 +107,14 @@ export function FilterTab({
                             htmlFor="genres"
                             className="block text-sm font-medium text-gray-700"
                         >
-                            Genres (comma-separated)
+                            Genres
                         </label>
                         <Input
                             id="genres"
                             value={genreInput}
                             onChange={(e) => setGenreInput(e.target.value)}
                             onKeyDown={handleKeyDown}
-                            placeholder="e.g., trance, metal"
+                            placeholder="trance, metal"
                         />
                     </div>
                     <div>
@@ -117,14 +122,14 @@ export function FilterTab({
                             htmlFor="artists"
                             className="block text-sm font-medium text-gray-700"
                         >
-                            Artists (comma-separated)
+                            Artists
                         </label>
                         <Input
                             id="artists"
                             value={artistInput}
                             onChange={(e) => setArtistInput(e.target.value)}
                             onKeyDown={handleKeyDown}
-                            placeholder="e.g., Armin Van Buuren, Metallica"
+                            placeholder="Armin Van Buuren, Metallica"
                         />
                     </div>
                 </div>
