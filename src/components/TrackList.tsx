@@ -594,7 +594,9 @@ const TrackList: React.FC<TrackListProps> = ({
                 />
             </div>
             <ScrollArea className="flex-grow">
-                <div className="pb-2">
+                <div className="pb-16">
+                    {" "}
+                    {/* Add padding-bottom here */}
                     {sortedAndFilteredTracks.map((item: any, index: number) => (
                         <TrackItem
                             key={`${item.track.id}-${index}`}
@@ -608,13 +610,6 @@ const TrackList: React.FC<TrackListProps> = ({
                             )}
                         />
                     ))}
-                    {hasNextPage && (
-                        <div ref={ref} className="p-4 text-center">
-                            {isFetchingNextPage
-                                ? "Loading more..."
-                                : "Load more"}
-                        </div>
-                    )}
                 </div>
             </ScrollArea>
             <SavePlaylistDialog
