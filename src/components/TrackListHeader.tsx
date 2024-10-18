@@ -26,6 +26,7 @@ interface TrackListHeaderProps {
     onClearFilters: () => void;
     onOpenFilterModal: () => void;
     deleteFilteredTracks: () => void;
+    playlistName: string;
 }
 
 export const TrackListHeader: React.FC<TrackListHeaderProps> = ({
@@ -40,10 +41,13 @@ export const TrackListHeader: React.FC<TrackListHeaderProps> = ({
     onClearFilters,
     onOpenFilterModal,
     deleteFilteredTracks,
+    playlistName,
 }) => {
     return (
         <div className="p-4 font-semibold border-b flex justify-between items-center">
-            <span>Playlist Tracks</span>
+            <h2 className="text-xl font-bold truncate" title={playlistName}>
+                {playlistName}
+            </h2>
             <div className="space-x-2 flex items-center">
                 <div className="space-x-2">
                     <Button

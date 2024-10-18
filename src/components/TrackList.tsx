@@ -19,6 +19,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 interface TrackListProps {
     playlistId: string;
+    playlistName: string;
     onPlaylistUpdate: () => void;
 }
 
@@ -27,6 +28,7 @@ type SortOrder = "asc" | "desc";
 
 const TrackList: React.FC<TrackListProps> = ({
     playlistId,
+    playlistName,
     onPlaylistUpdate,
 }) => {
     const queryClient = useQueryClient();
@@ -512,6 +514,7 @@ const TrackList: React.FC<TrackListProps> = ({
                 onClearFilters={clearFilters}
                 onOpenFilterModal={() => setIsFilterModalOpen(true)}
                 deleteFilteredTracks={deleteFilteredTracks}
+                playlistName={playlistName}
             />
             <FilterTab
                 isOpen={isFilterModalOpen}

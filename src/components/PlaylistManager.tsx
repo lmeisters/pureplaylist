@@ -228,15 +228,15 @@ const PlaylistManager = () => {
                 </ScrollArea>
             </div>
             <div className="flex-1 h-full overflow-hidden">
-                {selectedPlaylist ? (
+                {selectedPlaylist && (
                     <TrackList
                         playlistId={selectedPlaylist}
+                        playlistName={
+                            playlists.find((p) => p.id === selectedPlaylist)
+                                ?.name || "Unnamed Playlist"
+                        }
                         onPlaylistUpdate={handlePlaylistUpdate}
                     />
-                ) : (
-                    <div className="flex items-center justify-center h-full text-muted-foreground">
-                        <p>Select a playlist to view tracks</p>
-                    </div>
                 )}
             </div>
         </div>
