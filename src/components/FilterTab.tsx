@@ -6,6 +6,7 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
+    DialogDescription,
     DialogFooter,
 } from "@/components/ui/dialog";
 
@@ -78,11 +79,11 @@ export function FilterTab({
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Filter Tracks</DialogTitle>
+                    <DialogDescription>
+                        Enter keywords to filter your playlist tracks. Separate
+                        multiple entries with commas.
+                    </DialogDescription>
                 </DialogHeader>
-
-                <p className="text-sm text-gray-500">
-                    Separate all entries with commas.
-                </p>
 
                 <div className="space-y-4 py-4">
                     <div>
