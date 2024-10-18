@@ -2,9 +2,22 @@
 
 import { useSession, signIn, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 function Header() {
     const { data: session } = useSession();
+    const [isSigningIn, setIsSigningIn] = useState(false);
+
+    const handleSignIn = async () => {
+        setIsSigningIn(true);
+        try {
+            await signIn("spotify", { callbackUrl: "/" });
+        } catch (error) {
+            console.error("Sign in error:", error);
+        } finally {
+            setIsSigningIn(false);
+        }
+    };
 
     return (
         <header className="bg-background border-b">
@@ -22,9 +35,10 @@ function Header() {
                     <Button
                         variant="default"
                         size="sm"
-                        onClick={() => signIn("spotify")}
+                        onClick={handleSignIn}
+                        disabled={isSigningIn}
                     >
-                        Sign In
+                        {isSigningIn ? "Signing In..." : "Sign In"}
                     </Button>
                 )}
             </div>
