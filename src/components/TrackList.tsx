@@ -14,8 +14,7 @@ import { SavePlaylistDialog } from "./SavePlaylistDialog";
 import { SortButton } from "./SortButton";
 import { useQueryClient } from "@tanstack/react-query";
 import { FilterTab, FilterCriteria } from "./FilterTab";
-import { Button } from "@/components/ui/button";
-import { Filter } from "lucide-react";
+
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface TrackListProps {
@@ -63,6 +62,9 @@ const TrackList: React.FC<TrackListProps> = ({
     const { ref, inView } = useInView();
     const { data: session } = useSession();
     const { toast } = useToast();
+
+    // New state to keep track of deleted tracks
+    const [deletedTracks, setDeletedTracks] = useState<Set<string>>(new Set());
 
     useEffect(() => {
         if (inView && hasNextPage) {
@@ -156,7 +158,10 @@ const TrackList: React.FC<TrackListProps> = ({
 
         setIsSaving(true);
         try {
-            const trackUris = sortedTracks.map((item) => item.track.uri);
+            // Filter out deleted tracks
+            const trackUris = sortedAndFilteredTracks
+                .filter((item) => !deletedTracks.has(item.track.uri))
+                .map((item) => item.track.uri);
 
             if (createNew) {
                 if (!newPlaylistName) {
@@ -254,16 +259,24 @@ const TrackList: React.FC<TrackListProps> = ({
                     (oldData: any) => ({
                         ...oldData,
                         pages: [
-                            { items: sortedTracks.map((track) => ({ track })) },
+                            {
+                                items: sortedAndFilteredTracks.filter(
+                                    (item) => !deletedTracks.has(item.track.uri)
+                                ),
+                            },
                         ],
                     })
                 );
 
                 toast({
                     title: "Success",
-                    description: "Playlist updated with the new track order.",
+                    description:
+                        "Playlist updated with the new track order and deletions.",
                 });
             }
+
+            // Clear the deletedTracks set after successful save
+            setDeletedTracks(new Set());
 
             // Call onPlaylistUpdate after successful save
             onPlaylistUpdate();
@@ -356,86 +369,15 @@ const TrackList: React.FC<TrackListProps> = ({
         });
     };
 
-    const deleteSelectedTracks = async () => {
-        if (!session?.accessToken) {
-            toast({
-                title: "Error",
-                description: "You must be logged in to delete tracks.",
-                variant: "destructive",
-            });
-            return;
-        }
+    const deleteSelectedTracks = () => {
+        // Update local state only
+        setDeletedTracks(new Set([...deletedTracks, ...selectedTracks]));
+        setSelectedTracks(new Set());
 
-        try {
-            const response = await fetch(
-                `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        Authorization: `Bearer ${session.accessToken}`,
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        tracks: Array.from(selectedTracks).map((uri) => ({
-                            uri,
-                        })),
-                    }),
-                }
-            );
-
-            if (!response.ok) {
-                throw new Error("Failed to delete tracks");
-            }
-
-            // Update local state
-            const updatedTracks = sortedAndFilteredTracks.filter(
-                (track) => !selectedTracks.has(track.track.uri)
-            );
-
-            // Update query cache
-            queryClient.setQueryData(
-                ["playlistTracks", playlistId],
-                (oldData: any) => ({
-                    ...oldData,
-                    pages: oldData.pages.map((page: any) => ({
-                        ...page,
-                        items: page.items.filter(
-                            (item: any) => !selectedTracks.has(item.track.uri)
-                        ),
-                    })),
-                })
-            );
-
-            // Clear selection
-            setSelectedTracks(new Set());
-
-            // Update filtered tracks if necessary
-            if (filteredTracks.length > 0) {
-                setFilteredTracks(
-                    filteredTracks.filter(
-                        (track) => !selectedTracks.has(track.track.uri)
-                    )
-                );
-            }
-
-            toast({
-                title: "Success",
-                description: `${selectedTracks.size} track(s) removed from the playlist.`,
-            });
-
-            // Call onPlaylistUpdate to reflect changes in the parent component
-            onPlaylistUpdate();
-
-            // Optionally, refetch the data to ensure everything is in sync
-            queryClient.invalidateQueries(["playlistTracks", playlistId]);
-        } catch (error) {
-            console.error("Error deleting tracks:", error);
-            toast({
-                title: "Error",
-                description: "Failed to remove the tracks. Please try again.",
-                variant: "destructive",
-            });
-        }
+        toast({
+            title: "Tracks Marked for Deletion",
+            description: `${selectedTracks.size} track(s) will be removed when you save the playlist.`,
+        });
     };
 
     const applyFilters = (criteria: FilterCriteria) => {
@@ -532,27 +474,26 @@ const TrackList: React.FC<TrackListProps> = ({
     };
 
     const sortedAndFilteredTracks = React.useMemo(() => {
-        // If there are no filtered tracks, return all sorted tracks
+        let tracks = sortedTracks.filter(
+            (track) => !deletedTracks.has(track.track.uri)
+        );
+
         if (filteredTracks.length === 0) {
-            return sortedTracks;
+            return tracks;
         }
 
-        // Create a Set of filtered track IDs for faster lookup
         const filteredTrackIds = new Set(
             filteredTracks.map((track) => track.track.id)
         );
-
-        // Separate filtered and unfiltered tracks
-        const filtered = sortedTracks.filter((track) =>
+        const filtered = tracks.filter((track) =>
             filteredTrackIds.has(track.track.id)
         );
-        const unfiltered = sortedTracks.filter(
+        const unfiltered = tracks.filter(
             (track) => !filteredTrackIds.has(track.track.id)
         );
 
-        // Return filtered tracks first, followed by unfiltered tracks
         return [...filtered, ...unfiltered];
-    }, [sortedTracks, filteredTracks]);
+    }, [sortedTracks, filteredTracks, deletedTracks]);
 
     if (isLoading) return <div className="p-4">Loading tracks...</div>;
     if (error) return <div className="p-4">Error loading tracks</div>;
@@ -647,10 +588,15 @@ const TrackList: React.FC<TrackListProps> = ({
                             isMultiSelectMode={isMultiSelectMode}
                             selectedTracks={selectedTracks}
                             toggleTrackSelection={toggleTrackSelection}
-                            deleteTrack={deleteTrack}
+                            deleteTrack={(uri) =>
+                                setDeletedTracks(
+                                    new Set([...deletedTracks, uri])
+                                )
+                            }
                             isFiltered={filteredTracks.some(
                                 (ft) => ft.track.id === item.track.id
                             )}
+                            isDeleted={deletedTracks.has(item.track.uri)}
                         />
                     ))}
                 </div>
