@@ -20,6 +20,7 @@ interface TrackItemProps {
     selectedTracks: Set<string>;
     toggleTrackSelection: (trackUri: string) => void;
     deleteTrack: (trackUri: string) => void;
+    isFiltered: boolean;
 }
 
 export const TrackItem: React.FC<TrackItemProps> = ({
@@ -28,6 +29,7 @@ export const TrackItem: React.FC<TrackItemProps> = ({
     selectedTracks,
     toggleTrackSelection,
     deleteTrack,
+    isFiltered,
 }) => {
     const formatDate = (dateString: string): string => {
         return new Date(dateString).toLocaleDateString();
@@ -41,7 +43,11 @@ export const TrackItem: React.FC<TrackItemProps> = ({
 
     return (
         <div key={item.track.id}>
-            <div className="grid grid-cols-[auto,2fr,1fr,6rem,6rem,4rem,auto] gap-4 items-center p-2">
+            <div
+                className={`grid grid-cols-[auto,2fr,1fr,6rem,6rem,4rem,auto] gap-4 items-center p-2 ${
+                    isFiltered ? "bg-yellow-100" : ""
+                }`}
+            >
                 <span className="w-8 text-center text-muted-foreground">
                     {item.originalIndex}
                 </span>

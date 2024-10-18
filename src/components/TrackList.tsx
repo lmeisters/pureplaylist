@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { usePlaylistTracksQuery } from "@/hooks/usePlaylistTracksQuery";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useState } from "react";
@@ -12,6 +13,9 @@ import { TrackItem } from "./TrackItem";
 import { SavePlaylistDialog } from "./SavePlaylistDialog";
 import { SortButton } from "./SortButton";
 import { useQueryClient } from "@tanstack/react-query";
+import { FilterTab, FilterCriteria } from "./FilterTab";
+import { Button } from "@/components/ui/button";
+import { Filter } from "lucide-react";
 
 interface TrackListProps {
     playlistId: string;
@@ -46,6 +50,14 @@ const TrackList: React.FC<TrackListProps> = ({
     const [selectedTracks, setSelectedTracks] = useState<Set<string>>(
         new Set()
     );
+
+    const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+    const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>({
+        titleKeywords: [],
+        genres: [],
+        artists: [],
+    });
+    const [filteredTracks, setFilteredTracks] = useState<any[]>([]);
 
     const { ref, inView } = useInView();
     const { data: session } = useSession();
@@ -392,6 +404,100 @@ const TrackList: React.FC<TrackListProps> = ({
         }
     };
 
+    const applyFilters = (criteria: FilterCriteria) => {
+        setFilterCriteria(criteria);
+        const filtered = sortedTracks.filter((track) => {
+            const title = track.track.name.toLowerCase();
+            const artist = track.track.artists
+                .map((a: any) => a.name.toLowerCase())
+                .join(" ");
+            const genre = track.track.album.genres
+                ? track.track.album.genres.join(" ").toLowerCase()
+                : "";
+
+            const matchesTitleKeyword =
+                criteria.titleKeywords.length === 0 ||
+                criteria.titleKeywords.some((keyword) =>
+                    title.includes(keyword.toLowerCase())
+                );
+            const matchesGenre =
+                criteria.genres.length === 0 ||
+                criteria.genres.some((g) => genre.includes(g.toLowerCase()));
+            const matchesArtist =
+                criteria.artists.length === 0 ||
+                criteria.artists.some((a) => artist.includes(a.toLowerCase()));
+
+            return matchesTitleKeyword && matchesGenre && matchesArtist;
+        });
+
+        setFilteredTracks(filtered);
+    };
+
+    const clearFilters = () => {
+        setFilterCriteria({
+            titleKeywords: [],
+            genres: [],
+            artists: [],
+        });
+        setFilteredTracks([]);
+        setSelectedTracks(new Set()); // Clear selected tracks
+    };
+
+    const deleteFilteredTracks = async () => {
+        if (!session?.accessToken) {
+            toast({
+                title: "Error",
+                description: "You must be logged in to delete tracks.",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        try {
+            const trackUris = filteredTracks.map((track) => track.track.uri);
+            await Promise.all(trackUris.map((uri) => deleteTrack(uri)));
+
+            toast({
+                title: "Success",
+                description: `${filteredTracks.length} filtered track(s) removed from the playlist.`,
+            });
+
+            clearFilters();
+            fetchNextPage(); // Refetch tracks after deletion
+        } catch (error) {
+            console.error("Error deleting filtered tracks:", error);
+            toast({
+                title: "Error",
+                description:
+                    "Failed to remove some or all filtered tracks. Please try again.",
+                variant: "destructive",
+            });
+        }
+    };
+
+    const sortedAndFilteredTracks = React.useMemo(() => {
+        // If there are no filtered tracks, return all sorted tracks
+        if (filteredTracks.length === 0) {
+            return sortedTracks;
+        }
+
+        // Create a Set of filtered track IDs for faster lookup
+        const filteredTrackIds = new Set(
+            filteredTracks.map((track) => track.track.id)
+        );
+
+        // Separate filtered and unfiltered tracks
+        const filtered = sortedTracks.filter((track) =>
+            filteredTrackIds.has(track.track.id)
+        );
+        const unfiltered = sortedTracks.filter(
+            (track) => !filteredTrackIds.has(track.track.id)
+        );
+
+        // Return filtered tracks first, followed by unfiltered tracks
+        return [...filtered, ...unfiltered];
+    }, [sortedTracks, filteredTracks]);
+
     if (isLoading) return <div className="p-4">Loading tracks...</div>;
     if (error) return <div className="p-4">Error loading tracks</div>;
 
@@ -405,6 +511,17 @@ const TrackList: React.FC<TrackListProps> = ({
                 setIsDialogOpen={setIsDialogOpen}
                 savePlaylist={savePlaylist}
                 isSaving={isSaving}
+                filteredTracksCount={filteredTracks.length}
+                onClearFilters={clearFilters}
+                onOpenFilterModal={() => setIsFilterModalOpen(true)}
+                deleteFilteredTracks={deleteFilteredTracks}
+            />
+            <FilterTab
+                isOpen={isFilterModalOpen}
+                onClose={() => setIsFilterModalOpen(false)}
+                onApplyFilters={applyFilters}
+                onClearFilters={clearFilters}
+                initialFilters={filterCriteria}
             />
             <div className="p-2 font-semibold border-b grid grid-cols-[auto,auto,2fr,1fr,6rem,6rem,4rem] gap-4 items-center">
                 <span></span>
@@ -456,14 +573,17 @@ const TrackList: React.FC<TrackListProps> = ({
             </div>
             <ScrollArea className="flex-grow">
                 <div className="pb-2">
-                    {sortedTracks.map((item: any) => (
+                    {sortedAndFilteredTracks.map((item: any, index: number) => (
                         <TrackItem
-                            key={item.track.id}
+                            key={`${item.track.id}-${index}`}
                             item={item}
                             isMultiSelectMode={isMultiSelectMode}
                             selectedTracks={selectedTracks}
                             toggleTrackSelection={toggleTrackSelection}
                             deleteTrack={deleteTrack}
+                            isFiltered={filteredTracks.some(
+                                (ft) => ft.track.id === item.track.id
+                            )}
                         />
                     ))}
                     {hasNextPage && (
