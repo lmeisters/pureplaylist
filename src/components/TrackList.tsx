@@ -107,24 +107,24 @@ const TrackList: React.FC<TrackListProps> = ({
                 bValue = b.originalIndex;
                 break;
             case "title":
-                aValue = a.track.name.toLowerCase();
-                bValue = b.track.name.toLowerCase();
+                aValue = a.track?.name?.toLowerCase() || "";
+                bValue = b.track?.name?.toLowerCase() || "";
                 break;
             case "album":
-                aValue = a.track.album.name.toLowerCase();
-                bValue = b.track.album.name.toLowerCase();
+                aValue = a.track?.album?.name?.toLowerCase() || "";
+                bValue = b.track?.album?.name?.toLowerCase() || "";
                 break;
             case "date":
-                aValue = new Date(a.track.album.release_date).getTime();
-                bValue = new Date(b.track.album.release_date).getTime();
+                aValue = new Date(a.track?.album?.release_date || 0).getTime();
+                bValue = new Date(b.track?.album?.release_date || 0).getTime();
                 break;
             case "bpm":
                 aValue = a.audioFeatures?.tempo || 0;
                 bValue = b.audioFeatures?.tempo || 0;
                 break;
             case "duration":
-                aValue = a.track.duration_ms;
-                bValue = b.track.duration_ms;
+                aValue = a.track?.duration_ms || 0;
+                bValue = b.track?.duration_ms || 0;
                 break;
             default:
                 return 0;

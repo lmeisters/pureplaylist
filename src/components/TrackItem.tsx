@@ -52,7 +52,8 @@ export const TrackItem: React.FC<TrackItemProps> = ({
                     {item.originalIndex}
                 </span>
                 <div className="flex items-center space-x-4">
-                    {item.track.album.images[2]?.url ? (
+                    {item.track.album?.images &&
+                    item.track.album.images[2]?.url ? (
                         <img
                             src={item.track.album.images[2].url}
                             alt={item.track.name}
@@ -64,20 +65,22 @@ export const TrackItem: React.FC<TrackItemProps> = ({
                     <div>
                         <p className="font-medium">{item.track.name}</p>
                         <p className="text-sm text-muted-foreground">
-                            {item.track.artists
-                                .map((artist: any) => artist.name)
-                                .join(", ")}
+                            {item.track.artists && item.track.artists.length > 0
+                                ? item.track.artists
+                                      .map((artist: any) => artist.name)
+                                      .join(", ")
+                                : "Unknown Artist"}
                         </p>
                     </div>
                 </div>
                 <span className="text-sm text-muted-foreground truncate">
-                    {item.track.album.name}
+                    {item.track.album?.name || "Unknown Album"}
                 </span>
                 <span className="text-sm text-muted-foreground">
-                    {formatDate(item.track.album.release_date)}
+                    {formatDate(item.track.album?.release_date || "")}
                 </span>
                 <span className="text-sm text-muted-foreground">
-                    {item.audioFeatures?.tempo.toFixed(0)} BPM
+                    {item.audioFeatures?.tempo?.toFixed(0) || "N/A"} BPM
                 </span>
                 <span className="text-sm text-muted-foreground">
                     {formatDuration(item.track.duration_ms)}
