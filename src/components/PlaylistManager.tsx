@@ -15,11 +15,12 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 
 type SortOption = "default" | "nameAsc" | "nameDesc" | "sizeAsc" | "sizeDesc";
 
 const PlaylistManager = () => {
-    const { data: playlists, isLoading, error } = usePlaylistsQuery();
+    const { data: playlists, isLoading, error, refetch } = usePlaylistsQuery();
     const [selectedPlaylist, setSelectedPlaylist] = useState<string | null>(
         null
     );
@@ -28,6 +29,7 @@ const PlaylistManager = () => {
     const searchInputRef = useRef<HTMLInputElement>(null);
     const [favorites, setFavorites] = useState<Set<string>>(new Set());
     const queryClient = useQueryClient();
+    const { toast } = useToast();
 
     useEffect(() => {
         const storedFavorites = localStorage.getItem("favoritePlaylistIds");
@@ -35,6 +37,17 @@ const PlaylistManager = () => {
             setFavorites(new Set(JSON.parse(storedFavorites)));
         }
     }, []);
+
+    useEffect(() => {
+        if (error) {
+            toast({
+                title: "Error Loading Playlists",
+                description:
+                    "There was a problem loading your playlists. Please try again.",
+                variant: "destructive",
+            });
+        }
+    }, [error, toast]);
 
     const toggleFavorite = (playlistId: string) => {
         setFavorites((prevFavorites) => {
@@ -99,6 +112,10 @@ const PlaylistManager = () => {
         queryClient.invalidateQueries(["playlists"]);
     };
 
+    const handleRetry = () => {
+        refetch();
+    };
+
     if (isLoading)
         return (
             <div className="h-full flex items-center justify-center">
@@ -107,8 +124,9 @@ const PlaylistManager = () => {
         );
     if (error)
         return (
-            <div className="h-full flex items-center justify-center">
-                Error loading playlists
+            <div className="h-full flex flex-col items-center justify-center">
+                <p className="mb-4">Error loading playlists</p>
+                <Button onClick={handleRetry}>Retry</Button>
             </div>
         );
 
