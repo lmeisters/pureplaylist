@@ -16,6 +16,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { FilterTab, FilterCriteria } from "./FilterTab";
 
 import { Checkbox } from "@/components/ui/checkbox";
+import { PlaylistTrackResponse } from "@/types/spotify"; // Create this type
 
 interface TrackListProps {
     playlistId: string;
@@ -39,7 +40,14 @@ const TrackList: React.FC<TrackListProps> = ({
         isFetchingNextPage,
         isLoading,
         error,
-    } = usePlaylistTracksQuery(playlistId);
+    } = usePlaylistTracksQuery(playlistId) as {
+        data: { pages: PlaylistTrackResponse[] };
+        fetchNextPage: () => void;
+        hasNextPage: boolean;
+        isFetchingNextPage: boolean;
+        isLoading: boolean;
+        error: unknown;
+    };
 
     const [sortField, setSortField] = useState<SortField>("number");
     const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
@@ -497,6 +505,11 @@ const TrackList: React.FC<TrackListProps> = ({
         return [...filtered, ...unfiltered];
     }, [sortedTracks, filteredTracks, deletedTracks]);
 
+    const toggleMultiSelectMode = () => {
+        setIsMultiSelectMode(!isMultiSelectMode);
+        setSelectedTracks(new Set()); // Clear selections when toggling mode
+    };
+
     if (isLoading) return <div className="p-4">Loading tracks...</div>;
     if (error) return <div className="p-4">Error loading tracks</div>;
 
@@ -504,9 +517,8 @@ const TrackList: React.FC<TrackListProps> = ({
         <div className="h-full flex flex-col">
             <TrackListHeader
                 isMultiSelectMode={isMultiSelectMode}
-                setIsMultiSelectMode={setIsMultiSelectMode}
-                selectedTracks={selectedTracks}
-                deleteSelectedTracks={deleteSelectedTracks}
+                toggleMultiSelectMode={toggleMultiSelectMode}
+                selectedTracksCount={selectedTracks.size}
                 setIsDialogOpen={setIsDialogOpen}
                 savePlaylist={savePlaylist}
                 isSaving={isSaving}
@@ -523,7 +535,7 @@ const TrackList: React.FC<TrackListProps> = ({
                 onClearFilters={clearFilters}
                 initialFilters={filterCriteria}
             />
-            <div className="p-2 font-semibold border-b grid grid-cols-[auto,auto,2fr,1fr,6rem,6rem,4rem,auto] gap-4 items-center">
+            <div className="p-2 font-semibold border-b grid grid-cols-[auto,auto,2fr,1fr,auto,auto,auto,auto] md:grid-cols-[auto,auto,2fr,1fr,6rem,6rem,4rem,auto] gap-2 md:gap-4 items-center text-xs md:text-sm">
                 <span></span>
                 <SortButton
                     field="number"
@@ -546,6 +558,7 @@ const TrackList: React.FC<TrackListProps> = ({
                     sortField={sortField}
                     sortOrder={sortOrder}
                     toggleSort={toggleSort}
+                    className="hidden md:block"
                 >
                     Album
                 </SortButton>
@@ -555,6 +568,7 @@ const TrackList: React.FC<TrackListProps> = ({
                     sortOrder={sortOrder}
                     toggleSort={toggleSort}
                     icon="calendar"
+                    className="hidden md:block"
                 />
                 <SortButton
                     field="bpm"
@@ -562,6 +576,7 @@ const TrackList: React.FC<TrackListProps> = ({
                     sortOrder={sortOrder}
                     toggleSort={toggleSort}
                     icon="activity"
+                    className="hidden md:block"
                 />
                 <SortButton
                     field="duration"
@@ -582,8 +597,6 @@ const TrackList: React.FC<TrackListProps> = ({
             </div>
             <ScrollArea className="flex-grow">
                 <div className="pb-16">
-                    {" "}
-                    {/* Add padding-bottom here */}
                     {sortedAndFilteredTracks.map((item: any, index: number) => (
                         <TrackItem
                             key={`${item.track.id}-${index}`}

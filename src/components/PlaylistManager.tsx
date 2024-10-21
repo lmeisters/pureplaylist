@@ -71,8 +71,7 @@ const PlaylistManager = () => {
                 playlist.name.toLowerCase().includes(searchTerm.toLowerCase())
             ) || [];
 
-        // Sort by favorite status first, then apply the selected sort option
-        result.sort((a, b) => {
+        result.sort((a: any, b: any) => {
             if (favorites.has(a.id) && !favorites.has(b.id)) return -1;
             if (!favorites.has(a.id) && favorites.has(b.id)) return 1;
 
@@ -109,7 +108,7 @@ const PlaylistManager = () => {
 
     const handlePlaylistUpdate = () => {
         // Refetch the playlists data
-        queryClient.invalidateQueries(["playlists"]);
+        queryClient.invalidateQueries({ queryKey: ["playlists"] });
     };
 
     const handleRetry = () => {
@@ -131,18 +130,19 @@ const PlaylistManager = () => {
         );
 
     return (
-        <div className="flex h-full">
-            <div className="w-80 h-full overflow-hidden border-r flex flex-col">
-                <div className="p-5 font-semibold border-b flex justify-between items-center">
+        <div className="flex flex-col md:flex-row h-full">
+            <div className="w-full md:w-80 h-64 md:h-full overflow-hidden border-b md:border-r flex flex-col">
+                <div className="p-4 font-semibold border-b flex justify-between items-center">
                     <span>Playlists</span>
                 </div>
-                <div className="px-4 py-2 relative flex items-center space-x-2">
+                <div className="p-2 relative flex items-center space-x-2">
                     <Input
                         ref={searchInputRef}
                         type="text"
                         placeholder="Search playlists..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
+                        className="flex-grow"
                     />
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -178,28 +178,28 @@ const PlaylistManager = () => {
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
-                    <kbd className="absolute right-20 top-1/2 transform -translate-y-1/2 pointer-events-none inline-flex h-5 select-none items-center rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+                    <kbd className="hidden md:inline-flex absolute right-20 top-1/2 transform -translate-y-1/2 pointer-events-none h-5 select-none items-center rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
                         <span className="text-xs">Ctrl+K</span>
                     </kbd>
                 </div>
                 <ScrollArea className="flex-grow">
-                    <div className="pb-16 p-3">
+                    <div className="p-2 space-y-2">
                         {filteredAndSortedPlaylists?.map((playlist: any) => (
                             <div
                                 key={playlist.id}
                                 className="rounded-lg overflow-hidden"
                             >
                                 <div
-                                    className={`flex items-center space-x-4 px-4 py-3 cursor-pointer 
-                        transform transition-all duration-200 ease-out
-                        border border-border/50 rounded-lg
-                        shadow-[inset_0_-2px_4px_rgba(0,0,0,0.1)]
-                        hover:scale-[1.02] hover:-translate-y-1 
-                        ${
-                            selectedPlaylist === playlist.id
-                                ? "bg-accent shadow-md scale-[1.02] -translate-y-1"
-                                : "hover:bg-accent/10 bg-background"
-                        }`}
+                                    className={`flex items-center space-x-2 p-2 cursor-pointer 
+                                    transform transition-all duration-200 ease-out
+                                    border border-border/50 rounded-lg
+                                    shadow-[inset_0_-2px_4px_rgba(0,0,0,0.1)]
+                                    hover:scale-[1.02] hover:-translate-y-1 
+                                    ${
+                                        selectedPlaylist === playlist.id
+                                            ? "bg-accent shadow-md scale-[1.02] -translate-y-1"
+                                            : "hover:bg-accent/10 bg-background"
+                                    }`}
                                     onClick={() =>
                                         setSelectedPlaylist(playlist.id)
                                     }
@@ -208,24 +208,25 @@ const PlaylistManager = () => {
                                         <img
                                             src={playlist.images[0].url}
                                             alt={playlist.name}
-                                            className="w-10 h-10 rounded-lg shadow-sm"
+                                            className="w-8 h-8 rounded-lg shadow-sm"
                                         />
                                     ) : (
-                                        <div className="w-10 h-10 rounded-lg bg-muted shadow-sm flex items-center justify-center">
-                                            <Music className="w-6 h-6 text-muted-foreground" />
+                                        <div className="w-8 h-8 rounded-lg bg-muted shadow-sm flex items-center justify-center">
+                                            <Music className="w-4 h-4 text-muted-foreground" />
                                         </div>
                                     )}
                                     <div className="flex-grow min-w-0">
-                                        <p className="font-medium truncate">
+                                        <p className="font-medium truncate text-sm">
                                             {playlist.name}
                                         </p>
-                                        <p className="text-sm text-muted-foreground">
+                                        <p className="text-xs text-muted-foreground">
                                             {playlist.tracks.total} tracks
                                         </p>
                                     </div>
                                     <Button
                                         variant="ghost"
                                         size="icon"
+                                        className="ml-auto"
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             toggleFavorite(playlist.id);
