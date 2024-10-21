@@ -14,6 +14,7 @@ interface SortButtonProps {
     toggleSort: (field: string) => void;
     children?: React.ReactNode;
     icon?: "calendar" | "activity" | "clock";
+    className?: string;
 }
 
 export const SortButton: React.FC<SortButtonProps> = ({
@@ -23,6 +24,7 @@ export const SortButton: React.FC<SortButtonProps> = ({
     toggleSort,
     children,
     icon,
+    className,
 }) => {
     const IconComponent =
         icon === "calendar"
@@ -37,7 +39,7 @@ export const SortButton: React.FC<SortButtonProps> = ({
         <Button
             variant="ghost"
             size="sm"
-            className="h-8 flex items-center gap-1"
+            className={`h-8 flex items-center gap-1 ${className}`}
             onClick={() => toggleSort(field)}
         >
             {IconComponent && <IconComponent className="w-4 h-4" />}

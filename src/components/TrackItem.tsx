@@ -5,6 +5,7 @@ import { useState } from "react";
 
 interface TrackItemProps {
     item: any;
+    originalIndex: number;
     isMultiSelectMode: boolean;
     selectedTracks: Set<string>;
     toggleTrackSelection: (trackUri: string) => void;
@@ -15,6 +16,7 @@ interface TrackItemProps {
 
 export const TrackItem: React.FC<TrackItemProps> = ({
     item,
+    originalIndex,
     isMultiSelectMode,
     selectedTracks,
     toggleTrackSelection,
@@ -40,9 +42,7 @@ export const TrackItem: React.FC<TrackItemProps> = ({
                 isFiltered ? "bg-yellow-50" : ""
             } ${isDeleted ? "opacity-50 line-through" : ""}`}
         >
-            <div className="text-sm text-muted-foreground">
-                {item.originalIndex}
-            </div>
+            <div className="text-sm text-muted-foreground">{originalIndex}</div>
             <div className="flex items-center space-x-2 min-w-0">
                 <img
                     src={item.track.album.images[2]?.url || "/placeholder.png"}
