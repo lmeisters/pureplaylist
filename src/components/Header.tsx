@@ -4,12 +4,13 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
+import { useToast } from "@/hooks/use-toast";
 
 function Header() {
     const { data: session, status } = useSession();
     const [isSigningIn, setIsSigningIn] = useState(false);
     const router = useRouter();
+    const { toast } = useToast();
 
     const handleSignIn = async () => {
         setIsSigningIn(true);
@@ -20,7 +21,7 @@ function Header() {
             toast({
                 title: "Sign In Error",
                 description:
-                    "There was an problem signing in. Please try again.",
+                    "There was a problem signing in. Please try again.",
                 variant: "destructive",
             });
         } finally {

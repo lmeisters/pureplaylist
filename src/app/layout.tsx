@@ -1,20 +1,34 @@
-"use client";
-
 import "./globals.css";
-import { Inter } from "next/font/google";
-import Header from "@/components/Header";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Providers } from "@/components/Providers";
-import { Toaster } from "@/components/ui/toaster";
+import { RootLayoutClient } from "@/components/RootLayoutClient";
+import type { Metadata } from "next";
 
-const inter = Inter({ subsets: ["latin"] });
-
-// export const metadata = {
-//     title: "PurePlaylist",
-//     description: "Filter and search through your Spotify playlists",
-// };
-
-const queryClient = new QueryClient();
+export const metadata: Metadata = {
+    title: "PurePlaylist",
+    description: "Organize and manage your Spotify playlists with ease",
+    keywords: ["Spotify", "playlist", "music", "organization"],
+    authors: [{ name: "Linards M." }],
+    openGraph: {
+        title: "PurePlaylist",
+        description: "Organize and manage your Spotify playlists with ease",
+        // url: "https://pureplaylist.com",
+        siteName: "PurePlaylist",
+        // images: [
+        //     {
+        //         url: "https://pureplaylist.com/og-image.jpg",
+        //         width: 1200,
+        //         height: 630,
+        //     },
+        // ],
+        locale: "en_LV",
+        type: "website",
+    },
+    // twitter: {
+    //     card: "summary_large_image",
+    //     title: "PurePlaylist",
+    //     description: "Organize and manage your Spotify playlists with ease",
+    //     images: ["https://pureplaylist.com/twitter-image.jpg"],
+    // },
+};
 
 export default function RootLayout({
     children,
@@ -23,18 +37,8 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en">
-            <body className={inter.className}>
-                <Providers>
-                    <QueryClientProvider client={queryClient}>
-                        <div className="flex flex-col h-screen overflow-hidden">
-                            <Header />
-                            <main className="flex-1 overflow-hidden">
-                                {children}
-                            </main>
-                            <Toaster />
-                        </div>
-                    </QueryClientProvider>
-                </Providers>
+            <body>
+                <RootLayoutClient>{children}</RootLayoutClient>
             </body>
         </html>
     );
