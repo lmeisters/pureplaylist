@@ -1,6 +1,11 @@
 import "./globals.css";
 import { RootLayoutClient } from "@/components/RootLayoutClient";
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
+
+const ErrorBoundary = dynamic(() => import("@/components/ErrorBoundary"), {
+    ssr: false,
+});
 
 export const metadata: Metadata = {
     title: "PurePlaylist",
@@ -38,7 +43,9 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body>
-                <RootLayoutClient>{children}</RootLayoutClient>
+                <ErrorBoundary>
+                    <RootLayoutClient>{children}</RootLayoutClient>
+                </ErrorBoundary>
             </body>
         </html>
     );
