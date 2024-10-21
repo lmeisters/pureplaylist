@@ -2,9 +2,15 @@ import "./globals.css";
 import { RootLayoutClient } from "@/components/RootLayoutClient";
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
+import { Inter } from "next/font/google";
 
 const ErrorBoundary = dynamic(() => import("@/components/ErrorBoundary"), {
     ssr: false,
+});
+
+const inter = Inter({
+    subsets: ["latin"],
+    variable: "--font-inter",
 });
 
 export const metadata: Metadata = {
@@ -41,7 +47,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="en">
+        <html lang="en" className={`${inter.variable} font-sans`}>
             <body>
                 <ErrorBoundary>
                     <RootLayoutClient>{children}</RootLayoutClient>

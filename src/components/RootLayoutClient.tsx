@@ -1,12 +1,9 @@
 "use client";
 
-import { Inter } from "next/font/google";
 import Header from "@/components/Header";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Providers } from "@/components/Providers";
 import { Toaster } from "@/components/ui/toaster";
-
-const inter = Inter({ subsets: ["latin"] });
 
 const queryClient = new QueryClient();
 
