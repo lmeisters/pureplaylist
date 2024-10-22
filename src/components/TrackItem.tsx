@@ -12,6 +12,8 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import Image from "next/image";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface TrackItemProps {
     item: any;
@@ -47,6 +49,7 @@ export const TrackItem: React.FC<TrackItemProps> = ({
     };
 
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [imageLoaded, setImageLoaded] = useState(false);
 
     const handleDelete = () => {
         deleteTrack(item.track.uri);
@@ -56,7 +59,7 @@ export const TrackItem: React.FC<TrackItemProps> = ({
     return (
         <>
             <div
-                className={`grid grid-cols-[2rem,2fr,1fr,auto,auto,auto,auto] md:grid-cols-[2rem,2fr,1fr,6rem,6rem,4rem,2rem] gap-2 md:gap-4 items-center p-2 hover:bg-accent/10 ${
+                className={`grid grid-cols-[2rem,2fr,1fr,auto,auto,auto,auto] md:grid-cols-[2rem,2fr,1fr,6rem,6rem,4rem,2rem] gap-2 md:gap-4 items-center p-2 text-xs md:text-sm hover:bg-accent/50 relative ${
                     isFiltered ? "bg-yellow-50" : ""
                 } ${isDeleted ? "opacity-50 line-through" : ""}`}
             >
@@ -64,23 +67,33 @@ export const TrackItem: React.FC<TrackItemProps> = ({
                     {originalIndex}
                 </div>
                 <div className="flex items-center space-x-2 min-w-0">
-                    <img
-                        src={
-                            item.track.album.images[2]?.url ||
-                            "/placeholder.png"
-                        }
-                        alt={item.track.album.name}
-                        className="w-8 h-8 rounded"
-                    />
-                    <div className="truncate">
-                        <p className="font-medium truncate">
+                    <div className="relative w-10 h-10">
+                        {!imageLoaded && (
+                            <Skeleton className="absolute inset-0 w-10 h-10 rounded-sm" />
+                        )}
+                        <Image
+                            src={
+                                item.track.album.images[0]?.url ||
+                                "/placeholder-album.png"
+                            }
+                            alt={item.track.album.name}
+                            width={40}
+                            height={40}
+                            className={`rounded-sm ${
+                                imageLoaded ? "opacity-100" : "opacity-0"
+                            }`}
+                            onLoad={() => setImageLoaded(true)}
+                        />
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="font-semibold truncate">
                             {item.track.name}
-                        </p>
-                        <p className="text-sm text-muted-foreground truncate">
+                        </span>
+                        <span className="text-muted-foreground truncate">
                             {item.track.artists
-                                .map((a: any) => a.name)
+                                .map((artist) => artist.name)
                                 .join(", ")}
-                        </p>
+                        </span>
                     </div>
                 </div>
                 <div className="truncate hidden md:block">
