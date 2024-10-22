@@ -16,6 +16,19 @@ export const usePlaylistTracksQuery = (playlistId: string, filterCriteria: Filte
   const [allTracks, setAllTracks] = useState<any[]>([]);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const [audioFeatures, setAudioFeatures] = useState<Record<string, any>>({});
+
+  const fetchAudioFeatures = async (trackIds: string[]) => {
+    const batchIds = trackIds.join(',');
+    const response = await spotifyApi.get(`/audio-features?ids=${batchIds}`);
+    const newAudioFeatures = response.data.audio_features.reduce((acc: Record<string, any>, feature: any) => {
+      if (feature) {
+        acc[feature.id] = feature;
+      }
+      return acc;
+    }, {});
+    setAudioFeatures(prev => ({ ...prev, ...newAudioFeatures }));
+  };
 
   const query = useInfiniteQuery<PlaylistTrackResponse, Error>({
     queryKey: ['playlistTracks', playlistId],
@@ -25,16 +38,12 @@ export const usePlaylistTracksQuery = (playlistId: string, filterCriteria: Filte
         const tracksResponse = await spotifyApi.get(`/playlists/${playlistId}/tracks`, {
           params: {
             offset: pageParam,
-            limit: 50
+            limit: 100
           }
         });
 
-        const trackIds = tracksResponse.data.items.map((item: any) => item.track.id).join(',');
-        const audioFeaturesResponse = await spotifyApi.get(`/audio-features?ids=${trackIds}`);
-
         const mergedItems = tracksResponse.data.items.map((item: any, index: number) => ({
           ...item,
-          audioFeatures: audioFeaturesResponse.data.audio_features[index],
           originalIndex: (pageParam as number) + index + 1
         }));
 
@@ -111,6 +120,8 @@ export const usePlaylistTracksQuery = (playlistId: string, filterCriteria: Filte
     allTracks,
     filteredTracks,
     isLoadingMore,
-    loadingProgress
+    loadingProgress,
+    audioFeatures,
+    fetchAudioFeatures
   };
 };

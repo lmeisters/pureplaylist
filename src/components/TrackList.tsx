@@ -19,6 +19,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { PlaylistTrackResponse } from "@/types/spotify"; // Create this type
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils"; // Make sure you have this utility function
+import { FixedSizeList as List } from "react-window";
+import AutoSizer from "react-virtualized-auto-sizer";
 
 interface TrackListProps {
     playlistId: string;
@@ -52,6 +54,8 @@ const TrackList: React.FC<TrackListProps> = ({
         filteredTracks,
         isLoadingMore,
         loadingProgress,
+        audioFeatures,
+        fetchAudioFeatures,
     } = usePlaylistTracksQuery(playlistId, filterCriteria);
 
     const [sortField, setSortField] = useState<SortField>("number");
@@ -492,6 +496,55 @@ const TrackList: React.FC<TrackListProps> = ({
         setSelectedTracks(new Set()); // Clear selections when toggling mode
     };
 
+    const fetchAudioFeaturesForVisibleTracks = (
+        startIndex: number,
+        stopIndex: number
+    ) => {
+        const visibleTracks = sortedAndFilteredTracks.slice(
+            startIndex,
+            stopIndex + 1
+        );
+        const tracksWithoutAudioFeatures = visibleTracks.filter(
+            (track) => !audioFeatures[track.track.id]
+        );
+        if (tracksWithoutAudioFeatures.length > 0) {
+            const trackIds = tracksWithoutAudioFeatures.map(
+                (track) => track.track.id
+            );
+            fetchAudioFeatures(trackIds);
+        }
+    };
+
+    const Row = ({
+        index,
+        style,
+    }: {
+        index: number;
+        style: React.CSSProperties;
+    }) => {
+        const item = sortedAndFilteredTracks[index];
+        return (
+            <div style={style}>
+                <TrackItem
+                    key={`${item.track.id}-${item.originalIndex}`}
+                    item={item}
+                    originalIndex={item.originalIndex}
+                    isMultiSelectMode={isMultiSelectMode}
+                    selectedTracks={selectedTracks}
+                    toggleTrackSelection={toggleTrackSelection}
+                    deleteTrack={(uri) =>
+                        setDeletedTracks(new Set([...deletedTracks, uri]))
+                    }
+                    isFiltered={filteredTracks.some(
+                        (ft) => ft.track.id === item.track.id
+                    )}
+                    isDeleted={deletedTracks.has(item.track.uri)}
+                    audioFeatures={audioFeatures[item.track.id]}
+                />
+            </div>
+        );
+    };
+
     if (isLoading) return <div className="p-4">Loading tracks...</div>;
     if (error) return <div className="p-4">Error loading tracks</div>;
 
@@ -579,30 +632,29 @@ const TrackList: React.FC<TrackListProps> = ({
                     />
                 </div>
             </div>
-            <ScrollArea className="flex-grow">
-                <div className="pb-16">
-                    {sortedAndFilteredTracks.map((item: any) => (
-                        <TrackItem
-                            key={`${item.track.id}-${item.originalIndex}`}
-                            item={item}
-                            originalIndex={item.originalIndex}
-                            isMultiSelectMode={isMultiSelectMode}
-                            selectedTracks={selectedTracks}
-                            toggleTrackSelection={toggleTrackSelection}
-                            deleteTrack={(uri) =>
-                                setDeletedTracks(
-                                    new Set([...deletedTracks, uri])
-                                )
-                            }
-                            isFiltered={filteredTracks.some(
-                                (ft) => ft.track.id === item.track.id
-                            )}
-                            isDeleted={deletedTracks.has(item.track.uri)}
-                        />
-                    ))}
-                    <div ref={ref} style={{ height: 20 }} />
-                </div>
-            </ScrollArea>
+            <div className="flex-grow">
+                <AutoSizer>
+                    {({ height, width }) => (
+                        <List
+                            height={height}
+                            itemCount={sortedAndFilteredTracks.length}
+                            itemSize={50}
+                            width={width}
+                            onItemsRendered={({
+                                visibleStartIndex,
+                                visibleStopIndex,
+                            }) => {
+                                fetchAudioFeaturesForVisibleTracks(
+                                    visibleStartIndex,
+                                    visibleStopIndex
+                                );
+                            }}
+                        >
+                            {Row}
+                        </List>
+                    )}
+                </AutoSizer>
+            </div>
             <SavePlaylistDialog
                 isOpen={isDialogOpen}
                 setIsOpen={setIsDialogOpen}
