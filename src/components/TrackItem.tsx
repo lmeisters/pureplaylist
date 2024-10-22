@@ -67,7 +67,7 @@ export const TrackItem: React.FC<TrackItemProps> = ({
                     {originalIndex}
                 </div>
                 <div className="flex items-center space-x-2 min-w-0">
-                    <div className="relative w-10 h-10">
+                    <div className="relative w-10 h-10 flex-shrink-0">
                         {!imageLoaded && (
                             <Skeleton className="absolute inset-0 w-10 h-10 rounded-sm" />
                         )}
@@ -85,13 +85,13 @@ export const TrackItem: React.FC<TrackItemProps> = ({
                             onLoad={() => setImageLoaded(true)}
                         />
                     </div>
-                    <div className="flex flex-col">
-                        <span className="font-semibold truncate">
+                    <div className="flex flex-col min-w-0">
+                        <span className="font-semibold truncate max-w-[8rem] sm:max-w-[12rem] md:max-w-full">
                             {item.track.name}
                         </span>
-                        <span className="text-muted-foreground truncate">
+                        <span className="text-muted-foreground truncate max-w-[8rem] sm:max-w-[12rem] md:max-w-full">
                             {item.track.artists
-                                .map((artist) => artist.name)
+                                .map((artist: { name: string }) => artist.name)
                                 .join(", ")}
                         </span>
                     </div>

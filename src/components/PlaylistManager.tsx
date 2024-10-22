@@ -182,7 +182,7 @@ const PlaylistManager = () => {
                     </kbd>
                 </div>
                 <ScrollArea className="flex-grow">
-                    <div className="p-2 space-y-2">
+                    <div className="p-2 space-y-2 pb-16">
                         {filteredAndSortedPlaylists?.map((playlist: any) => (
                             <div
                                 key={playlist.id}

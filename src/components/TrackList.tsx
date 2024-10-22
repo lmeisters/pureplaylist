@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { FixedSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { Loader2 } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface TrackListProps {
     playlistId: string;
@@ -653,7 +654,7 @@ const TrackList: React.FC<TrackListProps> = ({
                     />
                 </div>
             </div>
-            <div className="flex-grow">
+            <div className="flex-grow pb-12">
                 <AutoSizer>
                     {({ height, width }) => (
                         <List
