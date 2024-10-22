@@ -2,7 +2,6 @@
 
 import React from "react";
 import { usePlaylistTracksQuery } from "@/hooks/usePlaylistTracksQuery";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { spotifyApi } from "@/lib/spotify";
@@ -16,13 +15,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { FilterTab, FilterCriteria } from "./FilterTab";
 
 import { Checkbox } from "@/components/ui/checkbox";
-import { PlaylistTrackResponse } from "@/types/spotify"; // Create this type
 import { Progress } from "@/components/ui/progress";
-import { cn } from "@/lib/utils"; // Make sure you have this utility function
+import { cn } from "@/lib/utils";
 import { FixedSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
-import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
 import { Loader2 } from "lucide-react";
 
 interface TrackListProps {

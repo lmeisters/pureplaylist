@@ -32,14 +32,14 @@ class ErrorBoundary extends React.Component<
             return (
                 <div className="flex flex-col items-center justify-center h-screen">
                     <h1 className="text-2xl font-bold mb-4">
-                        Oops! Something went wrong.
+                        Something went wrong.
                     </h1>
                     <p className="text-lg mb-4">
-                        We're sorry, but an error occurred while loading this
-                        page.
+                        We're sorry, but an error occurred while loading your
+                        playlists.
                     </p>
                     <button
-                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                        className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
                         onClick={() => this.setState({ hasError: false })}
                     >
                         Try again
