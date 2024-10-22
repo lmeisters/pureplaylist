@@ -21,6 +21,8 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils"; // Make sure you have this utility function
 import { FixedSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
 
 interface TrackListProps {
     playlistId: string;
@@ -464,8 +466,8 @@ const TrackList: React.FC<TrackListProps> = ({
                     ).getTime();
                     break;
                 case "bpm":
-                    aValue = a.audioFeatures?.tempo || 0;
-                    bValue = b.audioFeatures?.tempo || 0;
+                    aValue = audioFeatures[a.track.id]?.tempo || 0;
+                    bValue = audioFeatures[b.track.id]?.tempo || 0;
                     break;
                 case "duration":
                     aValue = a.track?.duration_ms || 0;
@@ -489,7 +491,14 @@ const TrackList: React.FC<TrackListProps> = ({
         }
 
         return sortedTracks;
-    }, [allTracks, filteredTracks, sortField, sortOrder, deletedTracks]);
+    }, [
+        allTracks,
+        filteredTracks,
+        sortField,
+        sortOrder,
+        deletedTracks,
+        audioFeatures,
+    ]);
 
     const toggleMultiSelectMode = () => {
         setIsMultiSelectMode(!isMultiSelectMode);
@@ -564,6 +573,7 @@ const TrackList: React.FC<TrackListProps> = ({
                 playlistName={playlistName}
                 onApplyFilters={applyFilters}
                 onClearFilters={clearFilters}
+                deleteSelectedTracks={deleteSelectedTracks}
             />
             <FilterTab
                 isOpen={isFilterModalOpen}
@@ -572,13 +582,13 @@ const TrackList: React.FC<TrackListProps> = ({
                 onClearFilters={clearFilters}
                 initialFilters={filterCriteria}
             />
-            <div className="p-2 font-semibold border-b grid grid-cols-[auto,auto,2fr,1fr,auto,auto,auto,auto] md:grid-cols-[auto,auto,2fr,1fr,6rem,6rem,4rem,auto] gap-2 md:gap-4 items-center text-xs md:text-sm">
-                <span></span>
+            <div className="p-2 font-semibold border-b grid grid-cols-[2rem,2fr,1fr,auto,auto,auto,auto] md:grid-cols-[2rem,2fr,1fr,6rem,6rem,4rem,2rem] gap-2 md:gap-4 items-center text-xs md:text-sm">
                 <SortButton
                     field="number"
                     sortField={sortField}
                     sortOrder={sortOrder}
                     toggleSort={toggleSort}
+                    className="justify-start pl-2"
                 >
                     #
                 </SortButton>
@@ -595,7 +605,7 @@ const TrackList: React.FC<TrackListProps> = ({
                     sortField={sortField}
                     sortOrder={sortOrder}
                     toggleSort={toggleSort}
-                    className="hidden md:block"
+                    className="hidden md:flex justify-center"
                 >
                     Album
                 </SortButton>
@@ -605,7 +615,7 @@ const TrackList: React.FC<TrackListProps> = ({
                     sortOrder={sortOrder}
                     toggleSort={toggleSort}
                     icon="calendar"
-                    className="hidden md:block"
+                    className="hidden md:flex justify-center"
                 />
                 <SortButton
                     field="bpm"
@@ -613,7 +623,7 @@ const TrackList: React.FC<TrackListProps> = ({
                     sortOrder={sortOrder}
                     toggleSort={toggleSort}
                     icon="activity"
-                    className="hidden md:block"
+                    className="hidden md:flex justify-center"
                 />
                 <SortButton
                     field="duration"
@@ -621,6 +631,7 @@ const TrackList: React.FC<TrackListProps> = ({
                     sortOrder={sortOrder}
                     toggleSort={toggleSort}
                     icon="clock"
+                    className="flex justify-center"
                 />
                 <div className="flex items-center justify-center">
                     <Checkbox

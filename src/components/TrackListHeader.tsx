@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Save, Filter } from "lucide-react";
+import { Save, Filter, Trash2 } from "lucide-react";
 
 interface TrackListHeaderProps {
     setIsDialogOpen: (value: boolean) => void;
@@ -10,6 +10,8 @@ interface TrackListHeaderProps {
     onOpenFilterModal: () => void;
     deleteFilteredTracks: () => void;
     playlistName: string;
+    deleteSelectedTracks: () => void;
+    selectedTracksCount: number;
 }
 
 export const TrackListHeader: React.FC<TrackListHeaderProps> = ({
@@ -21,6 +23,8 @@ export const TrackListHeader: React.FC<TrackListHeaderProps> = ({
     onOpenFilterModal,
     deleteFilteredTracks,
     playlistName,
+    deleteSelectedTracks,
+    selectedTracksCount,
 }) => {
     return (
         <div className="p-4 font-semibold border-b flex flex-col md:flex-row justify-between items-start md:items-center space-y-2 md:space-y-0">
@@ -49,6 +53,17 @@ export const TrackListHeader: React.FC<TrackListHeaderProps> = ({
                             Delete Filtered
                         </Button>
                     </>
+                )}
+                {selectedTracksCount > 0 && (
+                    <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={deleteSelectedTracks}
+                        className="flex items-center gap-2"
+                    >
+                        <Trash2 className="w-4 h-4" />
+                        Delete Selected ({selectedTracksCount})
+                    </Button>
                 )}
                 <Button
                     variant="outline"

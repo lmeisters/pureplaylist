@@ -39,17 +39,22 @@ export const SortButton: React.FC<SortButtonProps> = ({
         <Button
             variant="ghost"
             size="sm"
-            className={`h-8 flex items-center gap-1 ${className}`}
+            className={`h-8 flex items-center justify-center gap-1 px-2 w-full ${className}`}
             onClick={() => toggleSort(field)}
         >
-            {IconComponent && <IconComponent className="w-4 h-4" />}
-            {children}
-            {sortField === field &&
-                (sortOrder === "asc" ? (
-                    <ChevronUp className="h-4 w-4" />
-                ) : (
-                    <ChevronDown className="h-4 w-4" />
-                ))}
+            <div className="flex items-center gap-1">
+                {IconComponent && <IconComponent className="w-4 h-4" />}
+                {children}
+            </div>
+            {sortField === field && (
+                <div className="ml-1">
+                    {sortOrder === "asc" ? (
+                        <ChevronUp className="h-4 w-4" />
+                    ) : (
+                        <ChevronDown className="h-4 w-4" />
+                    )}
+                </div>
+            )}
         </Button>
     );
 };

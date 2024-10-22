@@ -2,6 +2,16 @@ import { Music, Trash2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface TrackItemProps {
     item: any;
@@ -12,6 +22,7 @@ interface TrackItemProps {
     deleteTrack: (trackUri: string) => void;
     isFiltered: boolean;
     isDeleted: boolean;
+    audioFeatures: any;
 }
 
 export const TrackItem: React.FC<TrackItemProps> = ({
@@ -23,6 +34,7 @@ export const TrackItem: React.FC<TrackItemProps> = ({
     deleteTrack,
     isFiltered,
     isDeleted,
+    audioFeatures,
 }) => {
     const formatDate = (dateString: string): string => {
         return new Date(dateString).toLocaleDateString();
@@ -36,57 +48,94 @@ export const TrackItem: React.FC<TrackItemProps> = ({
 
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
+    const handleDelete = () => {
+        deleteTrack(item.track.uri);
+        setShowDeleteConfirm(false);
+    };
+
     return (
-        <div
-            className={`grid grid-cols-[auto,2fr,1fr,auto,auto,auto,auto] md:grid-cols-[auto,2fr,1fr,6rem,6rem,4rem,auto] gap-2 md:gap-4 items-center p-2 hover:bg-accent/10 ${
-                isFiltered ? "bg-yellow-50" : ""
-            } ${isDeleted ? "opacity-50 line-through" : ""}`}
-        >
-            <div className="text-sm text-muted-foreground">{originalIndex}</div>
-            <div className="flex items-center space-x-2 min-w-0">
-                <img
-                    src={item.track.album.images[2]?.url || "/placeholder.png"}
-                    alt={item.track.album.name}
-                    className="w-8 h-8 rounded"
-                />
-                <div className="truncate">
-                    <p className="font-medium truncate">{item.track.name}</p>
-                    <p className="text-sm text-muted-foreground truncate">
-                        {item.track.artists.map((a: any) => a.name).join(", ")}
-                    </p>
+        <>
+            <div
+                className={`grid grid-cols-[2rem,2fr,1fr,auto,auto,auto,auto] md:grid-cols-[2rem,2fr,1fr,6rem,6rem,4rem,2rem] gap-2 md:gap-4 items-center p-2 hover:bg-accent/10 ${
+                    isFiltered ? "bg-yellow-50" : ""
+                } ${isDeleted ? "opacity-50 line-through" : ""}`}
+            >
+                <div className="text-sm text-muted-foreground pl-2">
+                    {originalIndex}
+                </div>
+                <div className="flex items-center space-x-2 min-w-0">
+                    <img
+                        src={
+                            item.track.album.images[2]?.url ||
+                            "/placeholder.png"
+                        }
+                        alt={item.track.album.name}
+                        className="w-8 h-8 rounded"
+                    />
+                    <div className="truncate">
+                        <p className="font-medium truncate">
+                            {item.track.name}
+                        </p>
+                        <p className="text-sm text-muted-foreground truncate">
+                            {item.track.artists
+                                .map((a: any) => a.name)
+                                .join(", ")}
+                        </p>
+                    </div>
+                </div>
+                <div className="truncate hidden md:block">
+                    {item.track.album.name}
+                </div>
+                <div className="text-sm text-muted-foreground hidden md:block text-right">
+                    {formatDate(item.track.album.release_date)}
+                </div>
+                <div className="text-sm text-muted-foreground hidden md:block text-right">
+                    {audioFeatures?.tempo
+                        ? `${audioFeatures.tempo.toFixed(0)} BPM`
+                        : "-"}
+                </div>
+                <div className="text-sm text-muted-foreground text-right">
+                    {formatDuration(item.track.duration_ms)}
+                </div>
+                <div className="flex items-center justify-center">
+                    {isMultiSelectMode ? (
+                        <Checkbox
+                            checked={selectedTracks.has(item.track.uri)}
+                            onCheckedChange={() =>
+                                toggleTrackSelection(item.track.uri)
+                            }
+                        />
+                    ) : (
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setShowDeleteConfirm(true)}
+                        >
+                            <Trash2 className="h-4 w-4 text-muted-foreground" />
+                        </Button>
+                    )}
                 </div>
             </div>
-            <div className="truncate hidden md:block">
-                {item.track.album.name}
-            </div>
-            <div className="text-sm text-muted-foreground hidden md:block">
-                {formatDate(item.track.album.release_date)}
-            </div>
-            <div className="text-sm text-muted-foreground hidden md:block">
-                {item.audioFeatures?.tempo?.toFixed(0) || "-"}
-            </div>
-            <div className="text-sm text-muted-foreground">
-                {formatDuration(item.track.duration_ms)}
-            </div>
-            <div className="flex items-center justify-end">
-                {isMultiSelectMode ? (
-                    <Checkbox
-                        checked={selectedTracks.has(item.track.uri)}
-                        onCheckedChange={() =>
-                            toggleTrackSelection(item.track.uri)
-                        }
-                    />
-                ) : (
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setShowDeleteConfirm(true)}
-                    >
-                        <Trash2 className="h-4 w-4 text-muted-foreground" />
-                    </Button>
-                )}
-            </div>
-            {/* ... existing DeleteConfirmDialog ... */}
-        </div>
+            <AlertDialog
+                open={showDeleteConfirm}
+                onOpenChange={setShowDeleteConfirm}
+            >
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to remove "{item.track.name}"
+                            from the playlist?
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDelete}>
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </>
     );
 };
