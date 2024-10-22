@@ -17,6 +17,8 @@ import { FilterTab, FilterCriteria } from "./FilterTab";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { PlaylistTrackResponse } from "@/types/spotify"; // Create this type
+import { Progress } from "@/components/ui/progress";
+import { cn } from "@/lib/utils"; // Make sure you have this utility function
 
 interface TrackListProps {
     playlistId: string;
@@ -46,6 +48,10 @@ const TrackList: React.FC<TrackListProps> = ({
         isFetchingNextPage,
         isLoading,
         error,
+        allTracks,
+        filteredTracks,
+        isLoadingMore,
+        loadingProgress,
     } = usePlaylistTracksQuery(playlistId, filterCriteria);
 
     const [sortField, setSortField] = useState<SortField>("number");
@@ -61,7 +67,6 @@ const TrackList: React.FC<TrackListProps> = ({
     );
 
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-    const [filteredTracks, setFilteredTracks] = useState<any[]>([]);
 
     const { ref, inView } = useInView();
     const { data: session } = useSession();
@@ -423,12 +428,15 @@ const TrackList: React.FC<TrackListProps> = ({
     };
 
     const sortedAndFilteredTracks = React.useMemo(() => {
-        let filteredTracks = tracks.filter(
+        let tracksToSort =
+            filteredTracks.length > 0 ? filteredTracks : allTracks;
+
+        let sortedTracks = tracksToSort.filter(
             (track) => !deletedTracks.has(track.track.uri)
         );
 
         // Apply sorting
-        filteredTracks.sort((a, b) => {
+        sortedTracks.sort((a, b) => {
             let aValue, bValue;
             switch (sortField) {
                 case "number":
@@ -467,8 +475,17 @@ const TrackList: React.FC<TrackListProps> = ({
             return 0;
         });
 
-        return filteredTracks;
-    }, [tracks, sortField, sortOrder, deletedTracks]);
+        // If there are filtered tracks, put them at the top
+        if (filteredTracks.length > 0) {
+            const nonFilteredTracks = allTracks.filter(
+                (track) =>
+                    !filteredTracks.some((ft) => ft.track.id === track.track.id)
+            );
+            sortedTracks = [...sortedTracks, ...nonFilteredTracks];
+        }
+
+        return sortedTracks;
+    }, [allTracks, filteredTracks, sortField, sortOrder, deletedTracks]);
 
     const toggleMultiSelectMode = () => {
         setIsMultiSelectMode(!isMultiSelectMode);
@@ -479,7 +496,7 @@ const TrackList: React.FC<TrackListProps> = ({
     if (error) return <div className="p-4">Error loading tracks</div>;
 
     return (
-        <div className="h-full flex flex-col">
+        <div className="h-full flex flex-col relative">
             <TrackListHeader
                 isMultiSelectMode={isMultiSelectMode}
                 toggleMultiSelectMode={toggleMultiSelectMode}
@@ -568,7 +585,7 @@ const TrackList: React.FC<TrackListProps> = ({
                         <TrackItem
                             key={`${item.track.id}-${item.originalIndex}`}
                             item={item}
-                            originalIndex={item.originalIndex} // Pass originalIndex to TrackItem
+                            originalIndex={item.originalIndex}
                             isMultiSelectMode={isMultiSelectMode}
                             selectedTracks={selectedTracks}
                             toggleTrackSelection={toggleTrackSelection}
@@ -583,11 +600,6 @@ const TrackList: React.FC<TrackListProps> = ({
                             isDeleted={deletedTracks.has(item.track.uri)}
                         />
                     ))}
-                    {isFetchingNextPage && (
-                        <div className="p-4 text-center">
-                            Loading more tracks...
-                        </div>
-                    )}
                     <div ref={ref} style={{ height: 20 }} />
                 </div>
             </ScrollArea>
@@ -599,6 +611,30 @@ const TrackList: React.FC<TrackListProps> = ({
                 savePlaylist={savePlaylist}
                 isSaving={isSaving}
             />
+            {isLoadingMore && (
+                <div
+                    className={cn(
+                        "fixed bottom-4 left-1/2 transform -translate-x-1/2",
+                        "bg-background/80 backdrop-blur-sm rounded-full p-2 shadow-md",
+                        "transition-opacity duration-300",
+                        "w-11/12 max-w-md", // Adjust width here
+                        loadingProgress === 100 ? "opacity-0" : "opacity-100"
+                    )}
+                >
+                    <div className="flex items-center space-x-2">
+                        <span className="text-xs whitespace-nowrap">
+                            Loading all tracks
+                        </span>
+                        <Progress
+                            value={loadingProgress}
+                            className="flex-grow"
+                        />
+                        <span className="text-xs font-medium whitespace-nowrap">
+                            {loadingProgress.toFixed(0)}%
+                        </span>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
