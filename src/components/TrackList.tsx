@@ -23,6 +23,7 @@ import { FixedSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 interface TrackListProps {
     playlistId: string;
@@ -554,8 +555,21 @@ const TrackList: React.FC<TrackListProps> = ({
         );
     };
 
-    if (isLoading) return <div className="p-4">Loading tracks...</div>;
-    if (error) return <div className="p-4">Error loading tracks</div>;
+    if (isLoading)
+        return (
+            <div className="h-full flex items-center justify-center">
+                <div className="flex flex-col items-center space-y-2">
+                    <Loader2 className="h-8 w-8 animate-spin" />
+                    <p>Loading tracks...</p>
+                </div>
+            </div>
+        );
+    if (error)
+        return (
+            <div className="h-full flex items-center justify-center">
+                <p className="text-red-500">Error loading tracks</p>
+            </div>
+        );
 
     return (
         <div className="h-full flex flex-col relative">
