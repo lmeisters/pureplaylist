@@ -37,7 +37,7 @@ function Header() {
 
     return (
         <header className="bg-background border-b">
-            <div className="w-full px-6 sm:px-8 flex justify-between items-center py-2">
+            <div className="w-full px-4 sm:px-4 flex justify-between items-center py-2">
                 <h1 className="text-xl font-semibold">PurePlaylist</h1>
                 {status === "authenticated" ? (
                     <Button
