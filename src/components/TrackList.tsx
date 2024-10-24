@@ -20,7 +20,6 @@ import { cn } from "@/lib/utils";
 import { FixedSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { Loader2 } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface TrackListProps {
     playlistId: string;
@@ -92,22 +91,12 @@ const TrackList: React.FC<TrackListProps> = ({
     }, [playlistId]);
 
     useEffect(() => {
-        if (data?.pages[0]?.playlistDetails) {
-            setPlaylistDetails(data.pages[0].playlistDetails);
+        if (data?.pages[0]) {
+            setPlaylistDetails(data.pages[0]);
         }
     }, [data]);
 
     const tracks = data?.pages.flatMap((page) => page.items) || [];
-
-    // function formatDuration(ms: number): string {
-    //     const minutes = Math.floor(ms / 60000);
-    //     const seconds = ((ms % 60000) / 1000).toFixed(0);
-    //     return `${minutes}:${Number(seconds) < 10 ? "0" : ""}${seconds}`;
-    // }
-
-    // function formatDate(dateString: string): string {
-    //     return new Date(dateString).toLocaleDateString();
-    // }
 
     const sortedTracks = [...tracks].sort((a, b) => {
         let aValue, bValue;
