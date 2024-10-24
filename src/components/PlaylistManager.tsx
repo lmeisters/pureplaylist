@@ -106,12 +106,7 @@ const PlaylistManager = () => {
     }, []);
 
     const handlePlaylistUpdate = () => {
-        // Refetch the playlists data
         queryClient.invalidateQueries({ queryKey: ["playlists"] });
-    };
-
-    const handleRetry = () => {
-        refetch();
     };
 
     if (isLoading)
@@ -124,7 +119,7 @@ const PlaylistManager = () => {
         return (
             <div className="h-full flex flex-col items-center justify-center">
                 <p className="mb-4">Error loading playlists</p>
-                <Button onClick={handleRetry}>Retry</Button>
+                <Button onClick={refetch}>Retry</Button>
             </div>
         );
 
