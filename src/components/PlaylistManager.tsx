@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 type SortOption = "default" | "nameAsc" | "nameDesc" | "sizeAsc" | "sizeDesc";
 
@@ -29,6 +31,7 @@ const PlaylistManager = () => {
     const [favorites, setFavorites] = useState<Set<string>>(new Set());
     const queryClient = useQueryClient();
     const { toast } = useToast();
+    const router = useRouter();
 
     useEffect(() => {
         const storedFavorites = localStorage.getItem("favoritePlaylistIds");
@@ -109,6 +112,11 @@ const PlaylistManager = () => {
         queryClient.invalidateQueries({ queryKey: ["playlists"] });
     };
 
+    const handleRelogin = async () => {
+        await signIn("spotify", { callbackUrl: "/" });
+        router.refresh();
+    };
+
     if (isLoading)
         return (
             <div className="h-full flex items-center justify-center">
@@ -118,8 +126,10 @@ const PlaylistManager = () => {
     if (error)
         return (
             <div className="h-full flex flex-col items-center justify-center">
-                <p className="mb-4">Error loading playlists</p>
-                <Button onClick={refetch}>Retry</Button>
+                <p className="mb-4">
+                    Error loading playlists. Please log in again.
+                </p>
+                <Button onClick={handleRelogin}>Relogin</Button>
             </div>
         );
 
