@@ -20,7 +20,13 @@ import { cn } from "@/lib/utils";
 import { FixedSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { Loader2 } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { PlaylistTrackResponse, PlaylistTrack } from "@/types/spotify";
+import { Session } from "next-auth";
+
+// Add this new interface
+interface ExtendedPlaylistTrack extends PlaylistTrack {
+    originalIndex: number;
+}
 
 interface TrackListProps {
     playlistId: string;
@@ -73,7 +79,7 @@ const TrackList: React.FC<TrackListProps> = ({
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 
     const { ref, inView } = useInView();
-    const { data: session } = useSession();
+    const { data: session } = useSession() as { data: Session | null };
     const { toast } = useToast();
 
     // New state to keep track of deleted tracks
@@ -92,8 +98,11 @@ const TrackList: React.FC<TrackListProps> = ({
     }, [playlistId]);
 
     useEffect(() => {
-        if (data?.pages[0]?.playlistDetails) {
-            setPlaylistDetails(data.pages[0].playlistDetails);
+        if (data?.pages[0]) {
+            const firstPage = data.pages[0] as PlaylistTrackResponse;
+            if (firstPage.playlistDetails) {
+                setPlaylistDetails(firstPage.playlistDetails);
+            }
         }
     }, [data]);
 
@@ -109,40 +118,80 @@ const TrackList: React.FC<TrackListProps> = ({
     //     return new Date(dateString).toLocaleDateString();
     // }
 
-    const sortedTracks = [...tracks].sort((a, b) => {
-        let aValue, bValue;
-        switch (sortField) {
-            case "number":
-                aValue = a.originalIndex;
-                bValue = b.originalIndex;
-                break;
-            case "title":
-                aValue = a.track?.name?.toLowerCase() || "";
-                bValue = b.track?.name?.toLowerCase() || "";
-                break;
-            case "album":
-                aValue = a.track?.album?.name?.toLowerCase() || "";
-                bValue = b.track?.album?.name?.toLowerCase() || "";
-                break;
-            case "date":
-                aValue = new Date(a.track?.album?.release_date || 0).getTime();
-                bValue = new Date(b.track?.album?.release_date || 0).getTime();
-                break;
-            case "bpm":
-                aValue = a.audioFeatures?.tempo || 0;
-                bValue = b.audioFeatures?.tempo || 0;
-                break;
-            case "duration":
-                aValue = a.track?.duration_ms || 0;
-                bValue = b.track?.duration_ms || 0;
-                break;
-            default:
-                return 0;
+    const getSortedTracks = (tracks: ExtendedPlaylistTrack[]) => {
+        let workingTracks = tracks.filter(
+            (track) => !deletedTracks.has(track.track.uri)
+        );
+
+        // Apply sorting
+        workingTracks.sort((a, b) => {
+            let aValue, bValue;
+            switch (sortField) {
+                case "number":
+                    aValue = a.originalIndex;
+                    bValue = b.originalIndex;
+                    break;
+                case "title":
+                    aValue = a.track?.name?.toLowerCase() || "";
+                    bValue = b.track?.name?.toLowerCase() || "";
+                    break;
+                case "album":
+                    aValue = a.track?.album?.name?.toLowerCase() || "";
+                    bValue = b.track?.album?.name?.toLowerCase() || "";
+                    break;
+                case "date":
+                    aValue = new Date(
+                        a.track?.album?.release_date || 0
+                    ).getTime();
+                    bValue = new Date(
+                        b.track?.album?.release_date || 0
+                    ).getTime();
+                    break;
+                case "bpm":
+                    aValue = audioFeatures[a.track.id]?.tempo || 0;
+                    bValue = audioFeatures[b.track.id]?.tempo || 0;
+                    break;
+                case "duration":
+                    aValue = a.track?.duration_ms || 0;
+                    bValue = b.track?.duration_ms || 0;
+                    break;
+                default:
+                    return 0;
+            }
+            if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
+            if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
+            return 0;
+        });
+
+        return workingTracks;
+    };
+
+    const sortedAndFilteredTracks = React.useMemo<
+        ExtendedPlaylistTrack[]
+    >(() => {
+        const tracksToSort =
+            filteredTracks.length > 0 ? filteredTracks : allTracks;
+
+        const sortedTracks = getSortedTracks(tracksToSort);
+
+        // If there are filtered tracks, put them at the top
+        if (filteredTracks.length > 0) {
+            const nonFilteredTracks = allTracks.filter(
+                (track) =>
+                    !filteredTracks.some((ft) => ft.track.id === track.track.id)
+            );
+            return [...sortedTracks, ...getSortedTracks(nonFilteredTracks)];
         }
-        if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
-        if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
-        return 0;
-    });
+
+        return sortedTracks;
+    }, [
+        allTracks,
+        filteredTracks,
+        sortField,
+        sortOrder,
+        deletedTracks,
+        audioFeatures,
+    ]);
 
     const toggleSort = (field: SortField) => {
         if (field === sortField) {
@@ -243,7 +292,8 @@ const TrackList: React.FC<TrackListProps> = ({
                 setNewPlaylistName("");
             } else {
                 // Update existing playlist
-                if (playlistDetails?.owner.id !== session?.user?.id) {
+                const userId = session?.user?.id;
+                if (!userId || playlistDetails?.owner.id !== userId) {
                     throw new Error(
                         "You don't have permission to modify this playlist."
                     );
@@ -263,8 +313,8 @@ const TrackList: React.FC<TrackListProps> = ({
                 // Update the local query cache
                 queryClient.setQueryData(
                     ["playlistTracks", playlistId],
-                    (oldData: any) => ({
-                        ...oldData,
+                    (oldData: unknown) => ({
+                        ...(oldData as { pages: any[] }),
                         pages: [
                             {
                                 items: sortedAndFilteredTracks.filter(
@@ -287,13 +337,14 @@ const TrackList: React.FC<TrackListProps> = ({
 
             // Call onPlaylistUpdate after successful save
             onPlaylistUpdate();
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Error saving playlist:", error);
             toast({
                 title: "Error",
                 description:
-                    error.message ||
-                    "Failed to save the playlist. Please try again.",
+                    error instanceof Error
+                        ? error.message
+                        : "Failed to save the playlist. Please try again.",
                 variant: "destructive",
             });
         }
@@ -378,7 +429,12 @@ const TrackList: React.FC<TrackListProps> = ({
 
     const deleteSelectedTracks = () => {
         // Update local state only
-        setDeletedTracks(new Set([...deletedTracks, ...selectedTracks]));
+        setDeletedTracks(
+            new Set([
+                ...Array.from(deletedTracks),
+                ...Array.from(selectedTracks),
+            ])
+        );
         setSelectedTracks(new Set());
 
         toast({
@@ -431,73 +487,6 @@ const TrackList: React.FC<TrackListProps> = ({
         }
     };
 
-    const sortedAndFilteredTracks = React.useMemo(() => {
-        let tracksToSort =
-            filteredTracks.length > 0 ? filteredTracks : allTracks;
-
-        let sortedTracks = tracksToSort.filter(
-            (track) => !deletedTracks.has(track.track.uri)
-        );
-
-        // Apply sorting
-        sortedTracks.sort((a, b) => {
-            let aValue, bValue;
-            switch (sortField) {
-                case "number":
-                    aValue = a.originalIndex;
-                    bValue = b.originalIndex;
-                    break;
-                case "title":
-                    aValue = a.track?.name?.toLowerCase() || "";
-                    bValue = b.track?.name?.toLowerCase() || "";
-                    break;
-                case "album":
-                    aValue = a.track?.album?.name?.toLowerCase() || "";
-                    bValue = b.track?.album?.name?.toLowerCase() || "";
-                    break;
-                case "date":
-                    aValue = new Date(
-                        a.track?.album?.release_date || 0
-                    ).getTime();
-                    bValue = new Date(
-                        b.track?.album?.release_date || 0
-                    ).getTime();
-                    break;
-                case "bpm":
-                    aValue = audioFeatures[a.track.id]?.tempo || 0;
-                    bValue = audioFeatures[b.track.id]?.tempo || 0;
-                    break;
-                case "duration":
-                    aValue = a.track?.duration_ms || 0;
-                    bValue = b.track?.duration_ms || 0;
-                    break;
-                default:
-                    return 0;
-            }
-            if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
-            if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
-            return 0;
-        });
-
-        // If there are filtered tracks, put them at the top
-        if (filteredTracks.length > 0) {
-            const nonFilteredTracks = allTracks.filter(
-                (track) =>
-                    !filteredTracks.some((ft) => ft.track.id === track.track.id)
-            );
-            sortedTracks = [...sortedTracks, ...nonFilteredTracks];
-        }
-
-        return sortedTracks;
-    }, [
-        allTracks,
-        filteredTracks,
-        sortField,
-        sortOrder,
-        deletedTracks,
-        audioFeatures,
-    ]);
-
     const toggleMultiSelectMode = () => {
         setIsMultiSelectMode(!isMultiSelectMode);
         setSelectedTracks(new Set()); // Clear selections when toggling mode
@@ -529,7 +518,7 @@ const TrackList: React.FC<TrackListProps> = ({
         index: number;
         style: React.CSSProperties;
     }) => {
-        const item = sortedAndFilteredTracks[index];
+        const item = sortedAndFilteredTracks[index] as ExtendedPlaylistTrack;
         return (
             <div style={style}>
                 <TrackItem
@@ -540,7 +529,9 @@ const TrackList: React.FC<TrackListProps> = ({
                     selectedTracks={selectedTracks}
                     toggleTrackSelection={toggleTrackSelection}
                     deleteTrack={(uri) =>
-                        setDeletedTracks(new Set([...deletedTracks, uri]))
+                        setDeletedTracks(
+                            new Set([...Array.from(deletedTracks), uri])
+                        )
                     }
                     isFiltered={filteredTracks.some(
                         (ft) => ft.track.id === item.track.id
@@ -583,7 +574,6 @@ const TrackList: React.FC<TrackListProps> = ({
                 deleteFilteredTracks={deleteFilteredTracks}
                 playlistName={playlistName}
                 onApplyFilters={applyFilters}
-                onClearFilters={clearFilters}
                 deleteSelectedTracks={deleteSelectedTracks}
             />
             <FilterTab
@@ -598,7 +588,7 @@ const TrackList: React.FC<TrackListProps> = ({
                     field="number"
                     sortField={sortField}
                     sortOrder={sortOrder}
-                    toggleSort={toggleSort}
+                    toggleSort={toggleSort as (field: string) => void}
                     className="justify-start pl-2"
                 >
                     #
@@ -607,7 +597,7 @@ const TrackList: React.FC<TrackListProps> = ({
                     field="title"
                     sortField={sortField}
                     sortOrder={sortOrder}
-                    toggleSort={toggleSort}
+                    toggleSort={toggleSort as (field: string) => void}
                 >
                     Title
                 </SortButton>
@@ -615,7 +605,7 @@ const TrackList: React.FC<TrackListProps> = ({
                     field="album"
                     sortField={sortField}
                     sortOrder={sortOrder}
-                    toggleSort={toggleSort}
+                    toggleSort={toggleSort as (field: string) => void}
                     className="hidden md:flex justify-center"
                 >
                     Album
@@ -624,7 +614,7 @@ const TrackList: React.FC<TrackListProps> = ({
                     field="date"
                     sortField={sortField}
                     sortOrder={sortOrder}
-                    toggleSort={toggleSort}
+                    toggleSort={toggleSort as (field: string) => void}
                     icon="calendar"
                     className="hidden md:flex justify-center"
                 />
@@ -632,7 +622,7 @@ const TrackList: React.FC<TrackListProps> = ({
                     field="bpm"
                     sortField={sortField}
                     sortOrder={sortOrder}
-                    toggleSort={toggleSort}
+                    toggleSort={toggleSort as (field: string) => void}
                     icon="activity"
                     className="hidden md:flex justify-center"
                 />
@@ -640,7 +630,7 @@ const TrackList: React.FC<TrackListProps> = ({
                     field="duration"
                     sortField={sortField}
                     sortOrder={sortOrder}
-                    toggleSort={toggleSort}
+                    toggleSort={toggleSort as (field: string) => void}
                     icon="clock"
                     className="flex justify-center"
                 />

@@ -35,8 +35,8 @@ class ErrorBoundary extends React.Component<
                         Something went wrong.
                     </h1>
                     <p className="text-lg mb-4">
-                        We're sorry, but an error occurred while loading your
-                        playlists.
+                        We&apos;re sorry, but an error occurred while loading
+                        your playlists.
                     </p>
                     <button
                         className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
