@@ -42,11 +42,12 @@ function HomeContent() {
                         <div className="md:w-1/2">
                             <div className="relative w-full aspect-video max-w-[1920px] max-h-[1080px] rounded-lg overflow-hidden shadow-xl">
                                 <Image
-                                    src="/app-screenshot.png"
+                                    src="/app-screenshot.webp"
                                     alt="PurePlaylist App Screenshot"
                                     width={1920}
                                     height={1080}
                                     className="object-cover"
+                                    priority
                                 />
                             </div>
                         </div>

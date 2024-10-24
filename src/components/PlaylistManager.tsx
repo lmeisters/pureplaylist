@@ -248,8 +248,10 @@ const PlaylistManager = () => {
                     <TrackList
                         playlistId={selectedPlaylist}
                         playlistName={
-                            playlists.find((p) => p.id === selectedPlaylist)
-                                ?.name || "Unnamed Playlist"
+                            playlists?.find(
+                                (p: { id: string; name: string }) =>
+                                    p.id === selectedPlaylist
+                            )?.name || "Unnamed Playlist"
                         }
                         onPlaylistUpdate={handlePlaylistUpdate}
                     />
