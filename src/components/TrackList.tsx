@@ -414,7 +414,11 @@ const TrackList: React.FC<TrackListProps> = ({
 
     const deleteSelectedTracks = () => {
         // Update local state only
-        setDeletedTracks(new Set([...deletedTracks, ...selectedTracks]));
+        setDeletedTracks((prevDeletedTracks) => {
+            const newDeletedTracks = new Set(prevDeletedTracks);
+            selectedTracks.forEach((track) => newDeletedTracks.add(track));
+            return newDeletedTracks;
+        });
         setSelectedTracks(new Set());
 
         toast({
