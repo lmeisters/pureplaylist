@@ -627,7 +627,6 @@ const TrackList: React.FC<TrackListProps> = ({
                 deleteFilteredTracks={deleteFilteredTracks}
                 playlistName={playlistName}
                 onApplyFilters={applyFilters}
-                onClearFilters={clearFilters}
                 deleteSelectedTracks={deleteSelectedTracks}
                 playlistDetails={currentPlaylistDetails}
             />

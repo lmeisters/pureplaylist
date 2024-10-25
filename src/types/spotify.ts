@@ -7,3 +7,10 @@ export interface PlaylistTrackResponse {
         };
     };
 }
+
+export interface PlaylistDetails {
+    owner: {
+        id: string;
+    };
+    // Add other properties as needed
+}

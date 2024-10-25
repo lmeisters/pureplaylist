@@ -1,20 +1,29 @@
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { Save, Filter, Trash2 } from "lucide-react";
+import { PlaylistDetails } from "@/types/spotify"; // Make sure to import this type
 
 interface TrackListHeaderProps {
-    setIsDialogOpen: (value: boolean) => void;
-    savePlaylist: (createNew: boolean) => void;
+    isMultiSelectMode: boolean;
+    toggleMultiSelectMode: () => void;
+    selectedTracksCount: number;
+    setIsDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    savePlaylist: (createNew: boolean) => Promise<void>;
     isSaving: boolean;
     filteredTracksCount: number;
     onClearFilters: () => void;
     onOpenFilterModal: () => void;
     deleteFilteredTracks: () => void;
     playlistName: string;
+    onApplyFilters: (criteria: any) => void; // Update this type if you have a specific filter criteria type
     deleteSelectedTracks: () => void;
-    selectedTracksCount: number;
+    playlistDetails: PlaylistDetails | null;
 }
 
 export const TrackListHeader: React.FC<TrackListHeaderProps> = ({
+    isMultiSelectMode,
+    toggleMultiSelectMode,
+    selectedTracksCount,
     setIsDialogOpen,
     savePlaylist,
     isSaving,
@@ -23,8 +32,9 @@ export const TrackListHeader: React.FC<TrackListHeaderProps> = ({
     onOpenFilterModal,
     deleteFilteredTracks,
     playlistName,
+    onApplyFilters,
     deleteSelectedTracks,
-    selectedTracksCount,
+    playlistDetails,
 }) => {
     return (
         <div className="p-4 font-semibold border-b flex flex-col md:flex-row justify-between items-start md:items-center space-y-2 md:space-y-0">
