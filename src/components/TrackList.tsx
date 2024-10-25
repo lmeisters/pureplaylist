@@ -580,7 +580,11 @@ const TrackList: React.FC<TrackListProps> = ({
                     selectedTracks={selectedTracks}
                     toggleTrackSelection={toggleTrackSelection}
                     deleteTrack={(uri) =>
-                        setDeletedTracks(new Set([...deletedTracks, uri]))
+                        setDeletedTracks((prevDeletedTracks) => {
+                            const newDeletedTracks = new Set(prevDeletedTracks);
+                            newDeletedTracks.add(uri);
+                            return newDeletedTracks;
+                        })
                     }
                     isFiltered={filteredTracks.some(
                         (ft) => ft.track.id === item.track.id
