@@ -1,8 +1,7 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { usePlaylistTracksQuery } from "@/hooks/usePlaylistTracksQuery";
-import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { spotifyApi } from "@/lib/spotify";
 import { useSession } from "next-auth/react";
@@ -20,6 +19,7 @@ import { cn } from "@/lib/utils";
 import { FixedSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { Loader2 } from "lucide-react";
+import { Session } from "next-auth";
 
 interface TrackListProps {
     playlistId: string;
@@ -29,6 +29,22 @@ interface TrackListProps {
 
 type SortField = "number" | "title" | "album" | "date" | "bpm" | "duration";
 type SortOrder = "asc" | "desc";
+
+interface PlaylistDetails {
+    owner: {
+        id: string;
+    };
+}
+
+// Extend the Session type to include the user id
+interface ExtendedSession extends Session {
+    user?: {
+        id?: string;
+        name?: string | null;
+        email?: string | null;
+        image?: string | null;
+    };
+}
 
 const TrackList: React.FC<TrackListProps> = ({
     playlistId,
@@ -55,13 +71,25 @@ const TrackList: React.FC<TrackListProps> = ({
         loadingProgress,
         audioFeatures,
         fetchAudioFeatures,
+        playlistDetails,
+        refetch,
     } = usePlaylistTracksQuery(playlistId, filterCriteria);
+
+    // Add this state to store playlist details
+    const [currentPlaylistDetails, setCurrentPlaylistDetails] =
+        useState<PlaylistDetails | null>(null);
+
+    // Update currentPlaylistDetails when playlistDetails changes
+    useEffect(() => {
+        if (playlistDetails) {
+            setCurrentPlaylistDetails(playlistDetails);
+        }
+    }, [playlistDetails]);
 
     const [sortField, setSortField] = useState<SortField>("number");
     const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
     const [newPlaylistName, setNewPlaylistName] = useState("");
     const [isSaving, setIsSaving] = useState(false);
-    const [playlistDetails, setPlaylistDetails] = useState<any>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [trackToDelete, setTrackToDelete] = useState<string | null>(null);
     const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
@@ -72,7 +100,7 @@ const TrackList: React.FC<TrackListProps> = ({
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 
     const { ref, inView } = useInView();
-    const { data: session } = useSession();
+    const { data: session } = useSession() as { data: ExtendedSession | null };
     const { toast } = useToast();
 
     // New state to keep track of deleted tracks
@@ -89,12 +117,6 @@ const TrackList: React.FC<TrackListProps> = ({
         setSortField("number");
         setSortOrder("asc");
     }, [playlistId]);
-
-    useEffect(() => {
-        if (data?.pages[0]) {
-            setPlaylistDetails(data.pages[0]);
-        }
-    }, [data]);
 
     const tracks = data?.pages.flatMap((page) => page.items) || [];
 
@@ -154,11 +176,19 @@ const TrackList: React.FC<TrackListProps> = ({
 
         setIsSaving(true);
         try {
-            // Filter out deleted tracks
-            const trackUris = sortedAndFilteredTracks
-                .filter((item) => !deletedTracks.has(item.track.uri))
-                .map((item) => item.track.uri);
+            // Refetch playlist details before saving
+            await refetch();
 
+            console.log("Current Playlist Details:", currentPlaylistDetails);
+            console.log("Full session object:", session);
+
+            if (!currentPlaylistDetails) {
+                throw new Error(
+                    "Playlist details are not available. Please try again."
+                );
+            }
+
+            // For new playlist creation
             if (createNew) {
                 if (!newPlaylistName) {
                     toast({
@@ -170,6 +200,11 @@ const TrackList: React.FC<TrackListProps> = ({
                     setIsSaving(false);
                     return;
                 }
+
+                // Get track URIs excluding deleted tracks
+                const trackUris = sortedAndFilteredTracks
+                    .filter((item) => !deletedTracks.has(item.track.uri))
+                    .map((item) => item.track.uri);
 
                 console.log("Creating new playlist...");
                 const response = await fetch(
@@ -200,81 +235,93 @@ const TrackList: React.FC<TrackListProps> = ({
 
                 const newPlaylistId = data.id;
                 console.log("Adding tracks to new playlist...");
-                const addTracksResponse = await fetch(
-                    `https://api.spotify.com/v1/playlists/${newPlaylistId}/tracks`,
-                    {
-                        method: "POST",
-                        headers: {
-                            Authorization: `Bearer ${session.accessToken}`,
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({ uris: trackUris }),
-                    }
-                );
 
-                if (!addTracksResponse.ok) {
-                    const errorData = await addTracksResponse.json();
-                    throw new Error(
-                        errorData.error?.message ||
-                            "Failed to add tracks to playlist"
+                // Add tracks in chunks of 100 (Spotify API limit)
+                const chunkSize = 100;
+                for (let i = 0; i < trackUris.length; i += chunkSize) {
+                    const chunk = trackUris.slice(i, i + chunkSize);
+                    const addTracksResponse = await fetch(
+                        `https://api.spotify.com/v1/playlists/${newPlaylistId}/tracks`,
+                        {
+                            method: "POST",
+                            headers: {
+                                Authorization: `Bearer ${session.accessToken}`,
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({ uris: chunk }),
+                        }
                     );
+
+                    if (!addTracksResponse.ok) {
+                        const errorData = await addTracksResponse.json();
+                        throw new Error(
+                            errorData.error?.message ||
+                                "Failed to add tracks to playlist"
+                        );
+                    }
                 }
 
                 console.log("Tracks added to new playlist");
-
                 toast({
                     title: "Success",
                     description: `New playlist "${newPlaylistName}" created with the sorted tracks.`,
                 });
 
-                // Close the dialog and reset the new playlist name
                 setIsDialogOpen(false);
                 setNewPlaylistName("");
             } else {
                 // Update existing playlist
-                if (playlistDetails?.owner.id !== session?.user?.id) {
-                    throw new Error(
-                        "You don't have permission to modify this playlist."
-                    );
-                }
-                await spotifyApi.put(
-                    `/playlists/${playlistId}/tracks`,
-                    {
-                        uris: trackUris,
-                    },
-                    {
-                        headers: {
-                            Authorization: `Bearer ${session.accessToken}`,
+                const trackUris = sortedAndFilteredTracks
+                    .filter((item) => !deletedTracks.has(item.track.uri))
+                    .map((item) => item.track.uri);
+
+                try {
+                    const response = await spotifyApi.put(
+                        `/playlists/${playlistId}/tracks`,
+                        {
+                            uris: trackUris,
                         },
-                    }
-                );
-
-                // Update the local query cache
-                queryClient.setQueryData(
-                    ["playlistTracks", playlistId],
-                    (oldData: any) => ({
-                        ...oldData,
-                        pages: [
-                            {
-                                items: sortedAndFilteredTracks.filter(
-                                    (item) => !deletedTracks.has(item.track.uri)
-                                ),
+                        {
+                            headers: {
+                                Authorization: `Bearer ${session.accessToken}`,
                             },
-                        ],
-                    })
-                );
+                        }
+                    );
 
-                toast({
-                    title: "Success",
-                    description:
-                        "Playlist updated with the new track order and deletions.",
-                });
+                    // Update the local query cache
+                    queryClient.setQueryData(
+                        ["playlistTracks", playlistId],
+                        (oldData: any) => ({
+                            ...oldData,
+                            pages: [
+                                {
+                                    items: sortedAndFilteredTracks.filter(
+                                        (item) =>
+                                            !deletedTracks.has(item.track.uri)
+                                    ),
+                                },
+                            ],
+                        })
+                    );
+
+                    toast({
+                        title: "Success",
+                        description:
+                            "Playlist updated with the new track order and deletions.",
+                    });
+                } catch (error: any) {
+                    console.error("Spotify API Error:", error);
+                    if (error.response?.status === 403) {
+                        throw new Error(
+                            "You don't have permission to modify this playlist. Please check your Spotify account permissions."
+                        );
+                    } else {
+                        throw error;
+                    }
+                }
             }
 
-            // Clear the deletedTracks set after successful save
             setDeletedTracks(new Set());
-
-            // Call onPlaylistUpdate after successful save
             onPlaylistUpdate();
         } catch (error: any) {
             console.error("Error saving playlist:", error);
@@ -574,6 +621,7 @@ const TrackList: React.FC<TrackListProps> = ({
                 onApplyFilters={applyFilters}
                 onClearFilters={clearFilters}
                 deleteSelectedTracks={deleteSelectedTracks}
+                playlistDetails={currentPlaylistDetails}
             />
             <FilterTab
                 isOpen={isFilterModalOpen}

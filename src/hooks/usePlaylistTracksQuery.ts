@@ -8,6 +8,18 @@ interface PlaylistTrackResponse {
   items: any[];
   next: string | null;
   total?: number;
+  playlistDetails?: {
+    owner: {
+      id: string;
+    };
+  };
+}
+
+interface PlaylistDetails {
+  owner: {
+    id: string;
+  };
+  // Add other properties as needed
 }
 
 export const usePlaylistTracksQuery = (playlistId: string, filterCriteria: FilterCriteria) => {
@@ -17,6 +29,7 @@ export const usePlaylistTracksQuery = (playlistId: string, filterCriteria: Filte
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [audioFeatures, setAudioFeatures] = useState<Record<string, any>>({});
+  const [playlistDetails, setPlaylistDetails] = useState<PlaylistDetails | null>(null);
 
   const fetchAudioFeatures = async (trackIds: string[]) => {
     const batchIds = trackIds.join(',');
@@ -35,12 +48,15 @@ export const usePlaylistTracksQuery = (playlistId: string, filterCriteria: Filte
     queryFn: async ({ pageParam = 0 }) => {
       if (session?.accessToken) {
         setAccessToken(session.accessToken as string);
-        const tracksResponse = await spotifyApi.get(`/playlists/${playlistId}/tracks`, {
-          params: {
-            offset: pageParam,
-            limit: 100
-          }
-        });
+        const [tracksResponse, playlistDetailsResponse] = await Promise.all([
+          spotifyApi.get(`/playlists/${playlistId}/tracks`, {
+            params: {
+              offset: pageParam,
+              limit: 100
+            }
+          }),
+          spotifyApi.get(`/playlists/${playlistId}`)
+        ]);
 
         const mergedItems = tracksResponse.data.items.map((item: any, index: number) => ({
           ...item,
@@ -49,10 +65,11 @@ export const usePlaylistTracksQuery = (playlistId: string, filterCriteria: Filte
 
         return {
           ...tracksResponse.data,
-          items: mergedItems
+          items: mergedItems,
+          playlistDetails: playlistDetailsResponse.data
         };
       }
-      return { items: [], next: null };
+      return { items: [], next: null, playlistDetails: null };
     },
     getNextPageParam: (lastPage) => {
       if (lastPage.next) {
@@ -115,6 +132,10 @@ export const usePlaylistTracksQuery = (playlistId: string, filterCriteria: Filte
     });
   }, [allTracks, filterCriteria]);
 
+  useEffect(() => {
+    setPlaylistDetails(query.data?.pages[0]?.playlistDetails ?? null);
+  }, [query.data]);
+
   return {
     ...query,
     allTracks,
@@ -122,6 +143,7 @@ export const usePlaylistTracksQuery = (playlistId: string, filterCriteria: Filte
     isLoadingMore,
     loadingProgress,
     audioFeatures,
-    fetchAudioFeatures
+    fetchAudioFeatures,
+    playlistDetails
   };
 };
