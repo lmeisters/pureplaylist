@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
 function Header() {
-    const { data: session, status } = useSession();
+    const { status } = useSession();
     const [isSigningIn, setIsSigningIn] = useState(false);
     const router = useRouter();
     const { toast } = useToast();

@@ -1,4 +1,4 @@
-import { Music, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -14,9 +14,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SpotifyTrack, AudioFeatures } from "@/types/spotify";
 
 interface TrackItemProps {
-    item: any;
+    item: { track: SpotifyTrack };
     originalIndex: number;
     isMultiSelectMode: boolean;
     selectedTracks: Set<string>;
@@ -24,7 +25,7 @@ interface TrackItemProps {
     deleteTrack: (trackUri: string) => void;
     isFiltered: boolean;
     isDeleted: boolean;
-    audioFeatures: any;
+    audioFeatures: AudioFeatures | null;
 }
 
 export const TrackItem: React.FC<TrackItemProps> = ({

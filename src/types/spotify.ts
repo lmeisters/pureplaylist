@@ -14,3 +14,20 @@ export interface PlaylistDetails {
     };
     // Add other properties as needed
 }
+
+export interface SpotifyTrack {
+    uri: string;
+    name: string;
+    artists: Array<{ name: string }>;
+    album: {
+        name: string;
+        images: Array<{ url: string }>;
+        release_date: string;
+    };
+    duration_ms: number;
+}
+
+export interface AudioFeatures {
+    tempo: number;
+    // Add other audio features as needed
+}

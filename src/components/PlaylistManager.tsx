@@ -20,8 +20,16 @@ import { signIn } from "next-auth/react";
 
 type SortOption = "default" | "nameAsc" | "nameDesc" | "sizeAsc" | "sizeDesc";
 
+interface Playlist {
+    id: string;
+    name: string;
+    images: { url: string }[];
+    tracks: { total: number };
+    createdAt: number;
+}
+
 const PlaylistManager = () => {
-    const { data: playlists, isLoading, error, refetch } = usePlaylistsQuery();
+    const { data: playlists, isLoading, error } = usePlaylistsQuery();
     const [selectedPlaylist, setSelectedPlaylist] = useState<string | null>(
         null
     );
@@ -68,18 +76,18 @@ const PlaylistManager = () => {
     };
 
     const filteredAndSortedPlaylists = useMemo(() => {
-        let result =
-            playlists?.filter((playlist: any) =>
+        const result =
+            playlists?.filter((playlist: Playlist) =>
                 playlist.name.toLowerCase().includes(searchTerm.toLowerCase())
             ) || [];
 
-        result.sort((a: any, b: any) => {
+        result.sort((a: Playlist, b: Playlist) => {
             if (favorites.has(a.id) && !favorites.has(b.id)) return -1;
             if (!favorites.has(a.id) && favorites.has(b.id)) return 1;
 
             switch (sortOption) {
                 case "default":
-                    return (b.createdAt as any) - (a.createdAt as any);
+                    return b.createdAt - a.createdAt;
                 case "nameAsc":
                     return a.name.localeCompare(b.name);
                 case "nameDesc":
@@ -187,10 +195,11 @@ const PlaylistManager = () => {
                 </div>
                 <ScrollArea className="flex-grow">
                     <div className="p-2 space-y-2 pb-16">
-                        {filteredAndSortedPlaylists?.map((playlist: any) => (
-                            <div
-                                key={playlist.id}
-                                className={`flex items-center space-x-2 p-2 cursor-pointer 
+                        {filteredAndSortedPlaylists?.map(
+                            (playlist: Playlist) => (
+                                <div
+                                    key={playlist.id}
+                                    className={`flex items-center space-x-2 p-2 cursor-pointer 
                                 transform transition-all duration-200 ease-out
                                 border border-border/50 rounded-lg
                                 shadow-[inset_0_-2px_4px_rgba(0,0,0,0.1)]
@@ -200,46 +209,49 @@ const PlaylistManager = () => {
                                         ? "bg-black text-white shadow-md scale-[1.02] -translate-y-1"
                                         : "hover:bg-accent/10 bg-background"
                                 }`}
-                                onClick={() => setSelectedPlaylist(playlist.id)}
-                            >
-                                {playlist.images?.[0]?.url ? (
-                                    <img
-                                        src={playlist.images[0].url}
-                                        alt={playlist.name}
-                                        className="w-8 h-8 rounded-lg shadow-sm"
-                                    />
-                                ) : (
-                                    <div className="w-8 h-8 rounded-lg bg-muted shadow-sm flex items-center justify-center">
-                                        <Music className="w-4 h-4 text-muted-foreground" />
-                                    </div>
-                                )}
-                                <div className="flex-grow min-w-0">
-                                    <p className="font-medium truncate text-sm">
-                                        {playlist.name}
-                                    </p>
-                                    <p className="text-xs text-muted-foreground">
-                                        {playlist.tracks.total} tracks
-                                    </p>
-                                </div>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="ml-auto"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        toggleFavorite(playlist.id);
-                                    }}
+                                    onClick={() =>
+                                        setSelectedPlaylist(playlist.id)
+                                    }
                                 >
-                                    <Star
-                                        className={`h-4 w-4 ${
-                                            favorites.has(playlist.id)
-                                                ? "text-yellow-400 fill-yellow-400"
-                                                : "text-muted-foreground"
-                                        }`}
-                                    />
-                                </Button>
-                            </div>
-                        ))}
+                                    {playlist.images?.[0]?.url ? (
+                                        <img
+                                            src={playlist.images[0].url}
+                                            alt={playlist.name}
+                                            className="w-8 h-8 rounded-lg shadow-sm"
+                                        />
+                                    ) : (
+                                        <div className="w-8 h-8 rounded-lg bg-muted shadow-sm flex items-center justify-center">
+                                            <Music className="w-4 h-4 text-muted-foreground" />
+                                        </div>
+                                    )}
+                                    <div className="flex-grow min-w-0">
+                                        <p className="font-medium truncate text-sm">
+                                            {playlist.name}
+                                        </p>
+                                        <p className="text-xs text-muted-foreground">
+                                            {playlist.tracks.total} tracks
+                                        </p>
+                                    </div>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="ml-auto"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            toggleFavorite(playlist.id);
+                                        }}
+                                    >
+                                        <Star
+                                            className={`h-4 w-4 ${
+                                                favorites.has(playlist.id)
+                                                    ? "text-yellow-400 fill-yellow-400"
+                                                    : "text-muted-foreground"
+                                            }`}
+                                        />
+                                    </Button>
+                                </div>
+                            )
+                        )}
                     </div>
                 </ScrollArea>
             </div>
