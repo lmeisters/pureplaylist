@@ -6,14 +6,15 @@ import {
     Activity,
     Clock,
 } from "lucide-react";
+import { SortField, SortOrder } from "./TrackList"; // Adjust the import path as needed
 
 interface SortButtonProps {
-    field: string;
-    sortField: string;
-    sortOrder: "asc" | "desc";
-    toggleSort: (field: string) => void;
+    field: SortField;
+    sortField: SortField;
+    sortOrder: SortOrder;
+    toggleSort: (field: SortField) => void;
     children?: React.ReactNode;
-    icon?: "calendar" | "activity" | "clock";
+    icon?: string;
     className?: string;
 }
 

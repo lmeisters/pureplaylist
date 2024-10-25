@@ -21,14 +21,21 @@ import AutoSizer from "react-virtualized-auto-sizer";
 import { Loader2 } from "lucide-react";
 import { Session } from "next-auth";
 
+// Near the top of the file, after the imports
+export type SortField =
+    | "number"
+    | "title"
+    | "album"
+    | "date"
+    | "bpm"
+    | "duration";
+export type SortOrder = "asc" | "desc";
+
 interface TrackListProps {
     playlistId: string;
     playlistName: string;
     onPlaylistUpdate: () => void;
 }
-
-type SortField = "number" | "title" | "album" | "date" | "bpm" | "duration";
-type SortOrder = "asc" | "desc";
 
 interface PlaylistDetails {
     owner: {
