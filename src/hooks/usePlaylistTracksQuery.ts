@@ -1,40 +1,26 @@
-import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { spotifyApi, setAccessToken } from '@/lib/spotify';
 import { useSession } from 'next-auth/react';
 import { FilterCriteria } from '@/components/FilterTab';
 import { useEffect, useState, useMemo } from 'react';
+import { SpotifyTrack, AudioFeatures as ImportedAudioFeatures, PlaylistTrackResponse } from '@/types/spotify';
 
-interface PlaylistTrackResponse {
-  items: any[];
-  next: string | null;
-  total?: number;
-  playlistDetails?: {
-    owner: {
-      id: string;
-    };
-  };
-}
-
-interface PlaylistDetails {
-  owner: {
-    id: string;
-  };
-  // Add other properties as needed
+interface AudioFeatures extends ImportedAudioFeatures {
+  id: string;
 }
 
 export const usePlaylistTracksQuery = (playlistId: string, filterCriteria: FilterCriteria) => {
   const { data: session } = useSession();
-  const queryClient = useQueryClient();
-  const [allTracks, setAllTracks] = useState<any[]>([]);
+  const [allTracks, setAllTracks] = useState<SpotifyTrack[]>([]);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
-  const [audioFeatures, setAudioFeatures] = useState<Record<string, any>>({});
-  const [playlistDetails, setPlaylistDetails] = useState<PlaylistDetails | null>(null);
+  const [audioFeatures, setAudioFeatures] = useState<Record<string, AudioFeatures>>({});
+  const [playlistDetails, setPlaylistDetails] = useState<PlaylistTrackResponse['playlistDetails'] | null>(null);
 
   const fetchAudioFeatures = async (trackIds: string[]) => {
     const batchIds = trackIds.join(',');
     const response = await spotifyApi.get(`/audio-features?ids=${batchIds}`);
-    const newAudioFeatures = response.data.audio_features.reduce((acc: Record<string, any>, feature: any) => {
+    const newAudioFeatures = response.data.audio_features.reduce((acc: Record<string, AudioFeatures>, feature: AudioFeatures) => {
       if (feature) {
         acc[feature.id] = feature;
       }
@@ -59,17 +45,18 @@ export const usePlaylistTracksQuery = (playlistId: string, filterCriteria: Filte
         ]);
 
         const mergedItems = tracksResponse.data.items.map((item: any, index: number) => ({
-          ...item,
+          track: item.track,
           originalIndex: (pageParam as number) + index + 1
         }));
 
         return {
-          ...tracksResponse.data,
           items: mergedItems,
+          next: tracksResponse.data.next,
+          total: tracksResponse.data.total,
           playlistDetails: playlistDetailsResponse.data
         };
       }
-      return { items: [], next: null, playlistDetails: null };
+      return { items: [], next: null, total: 0, playlistDetails: null };
     },
     getNextPageParam: (lastPage) => {
       if (lastPage.next) {
@@ -101,7 +88,7 @@ export const usePlaylistTracksQuery = (playlistId: string, filterCriteria: Filte
       const newTracks = query.data.pages.flatMap(page => page.items);
       setAllTracks(newTracks);
       
-      const totalTracks = query.data.pages[0].total || 0;
+      const totalTracks = query.data.pages[0].total;
       const loadedTracks = newTracks.length;
       const progress = totalTracks > 0 ? (loadedTracks / totalTracks) * 100 : 0;
       setLoadingProgress(Math.min(progress, 100));
@@ -116,9 +103,9 @@ export const usePlaylistTracksQuery = (playlistId: string, filterCriteria: Filte
       return [];
     }
 
-    return allTracks.filter((item: any) => {
+    return allTracks.filter((item: SpotifyTrack) => {
       const title = item.track.name.toLowerCase();
-      const artist = item.track.artists.map((a: any) => a.name.toLowerCase()).join(" ");
+      const artist = item.track.artists.map((a) => a.name.toLowerCase()).join(" ");
       const genre = item.track.album.genres ? item.track.album.genres.join(" ").toLowerCase() : "";
 
       const matchesTitle = filterCriteria.titleKeywords.length === 0 || 

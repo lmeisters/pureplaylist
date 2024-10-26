@@ -17,7 +17,21 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { SpotifyTrack, AudioFeatures } from "@/types/spotify";
 
 interface TrackItemProps {
-    item: { track: SpotifyTrack };
+    item: {
+        track: {
+            id: string;
+            uri: string;
+            name: string;
+            artists: Array<{ name: string }>;
+            album: {
+                name: string;
+                images: Array<{ url: string }>;
+                release_date: string;
+            };
+            duration_ms: number;
+        };
+        originalIndex: number;
+    };
     originalIndex: number;
     isMultiSelectMode: boolean;
     selectedTracks: Set<string>;

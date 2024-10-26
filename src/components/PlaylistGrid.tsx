@@ -69,11 +69,11 @@ const PlaylistGrid = () => {
                     <TrackList
                         playlistId={selectedPlaylist}
                         playlistName={
-                            playlists.find(
+                            playlists?.find(
                                 (p: Playlist) => p.id === selectedPlaylist
                             )?.name || ""
                         }
-                        onPlaylistUpdate={() => {}} // Add a function to handle playlist updates if needed
+                        onPlaylistUpdate={() => {}}
                     />
                 </div>
             )}

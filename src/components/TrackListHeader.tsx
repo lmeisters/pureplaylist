@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Save, Filter, Trash2 } from "lucide-react";
-import { PlaylistDetails } from "@/types/spotify"; // Make sure to import this type
+import { PlaylistDetails } from "@/types/spotify";
 
 interface TrackListHeaderProps {
     isMultiSelectMode: boolean;
@@ -15,7 +15,7 @@ interface TrackListHeaderProps {
     onOpenFilterModal: () => void;
     deleteFilteredTracks: () => void;
     playlistName: string;
-    onApplyFilters: (criteria: any) => void; // Update this type if you have a specific filter criteria type
+    onApplyFilters: (criteria: any) => void;
     deleteSelectedTracks: () => void;
     playlistDetails: PlaylistDetails | null;
 }

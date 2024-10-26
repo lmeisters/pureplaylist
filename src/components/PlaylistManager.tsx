@@ -25,7 +25,6 @@ interface Playlist {
     name: string;
     images: { url: string }[];
     tracks: { total: number };
-    createdAt: number;
 }
 
 const PlaylistManager = () => {
@@ -77,17 +76,18 @@ const PlaylistManager = () => {
 
     const filteredAndSortedPlaylists = useMemo(() => {
         const result =
-            playlists?.filter((playlist: Playlist) =>
+            playlists?.filter((playlist) =>
                 playlist.name.toLowerCase().includes(searchTerm.toLowerCase())
             ) || [];
 
-        result.sort((a: Playlist, b: Playlist) => {
+        result.sort((a, b) => {
             if (favorites.has(a.id) && !favorites.has(b.id)) return -1;
             if (!favorites.has(a.id) && favorites.has(b.id)) return 1;
 
             switch (sortOption) {
                 case "default":
-                    return b.createdAt - a.createdAt;
+                    // Use a different property for default sorting if createdAt is not available
+                    return 0;
                 case "nameAsc":
                     return a.name.localeCompare(b.name);
                 case "nameDesc":

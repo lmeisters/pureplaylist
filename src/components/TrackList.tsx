@@ -20,8 +20,8 @@ import { FixedSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { Loader2 } from "lucide-react";
 import { Session } from "next-auth";
+import { SpotifyTrack, AudioFeatures } from "@/types/spotify";
 
-// Near the top of the file, after the imports
 export type SortField =
     | "number"
     | "title"
@@ -69,7 +69,6 @@ const TrackList: React.FC<TrackListProps> = ({
         data,
         fetchNextPage,
         hasNextPage,
-        isFetchingNextPage,
         isLoading,
         error,
         allTracks,
@@ -98,7 +97,6 @@ const TrackList: React.FC<TrackListProps> = ({
     const [newPlaylistName, setNewPlaylistName] = useState("");
     const [isSaving, setIsSaving] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [trackToDelete, setTrackToDelete] = useState<string | null>(null);
     const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
     const [selectedTracks, setSelectedTracks] = useState<Set<string>>(
         new Set()
@@ -127,40 +125,46 @@ const TrackList: React.FC<TrackListProps> = ({
 
     const tracks = data?.pages.flatMap((page) => page.items) || [];
 
-    const sortedTracks = [...tracks].sort((a, b) => {
-        let aValue, bValue;
-        switch (sortField) {
-            case "number":
-                aValue = a.originalIndex;
-                bValue = b.originalIndex;
-                break;
-            case "title":
-                aValue = a.track?.name?.toLowerCase() || "";
-                bValue = b.track?.name?.toLowerCase() || "";
-                break;
-            case "album":
-                aValue = a.track?.album?.name?.toLowerCase() || "";
-                bValue = b.track?.album?.name?.toLowerCase() || "";
-                break;
-            case "date":
-                aValue = new Date(a.track?.album?.release_date || 0).getTime();
-                bValue = new Date(b.track?.album?.release_date || 0).getTime();
-                break;
-            case "bpm":
-                aValue = a.audioFeatures?.tempo || 0;
-                bValue = b.audioFeatures?.tempo || 0;
-                break;
-            case "duration":
-                aValue = a.track?.duration_ms || 0;
-                bValue = b.track?.duration_ms || 0;
-                break;
-            default:
-                return 0;
+    const sortedTracks = [...tracks].sort(
+        (a: SpotifyTrack, b: SpotifyTrack) => {
+            let aValue, bValue;
+            switch (sortField) {
+                case "number":
+                    aValue = a.originalIndex;
+                    bValue = b.originalIndex;
+                    break;
+                case "title":
+                    aValue = a.track.name.toLowerCase();
+                    bValue = b.track.name.toLowerCase();
+                    break;
+                case "album":
+                    aValue = a.track.album.name.toLowerCase();
+                    bValue = b.track.album.name.toLowerCase();
+                    break;
+                case "date":
+                    aValue = new Date(a.track.album.release_date).getTime();
+                    bValue = new Date(b.track.album.release_date).getTime();
+                    break;
+                case "bpm":
+                    aValue =
+                        (audioFeatures[a.track.id] as AudioFeatures)?.tempo ||
+                        0;
+                    bValue =
+                        (audioFeatures[b.track.id] as AudioFeatures)?.tempo ||
+                        0;
+                    break;
+                case "duration":
+                    aValue = a.track.duration_ms;
+                    bValue = b.track.duration_ms;
+                    break;
+                default:
+                    return 0;
+            }
+            if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
+            if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
+            return 0;
         }
-        if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
-        if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
-        return 0;
-    });
+    );
 
     const toggleSort = (field: SortField) => {
         if (field === sortField) {
@@ -283,7 +287,7 @@ const TrackList: React.FC<TrackListProps> = ({
                     .map((item) => item.track.uri);
 
                 try {
-                    const response = await spotifyApi.put(
+                    await spotifyApi.put(
                         `/playlists/${playlistId}/tracks`,
                         {
                             uris: trackUris,
@@ -298,17 +302,24 @@ const TrackList: React.FC<TrackListProps> = ({
                     // Update the local query cache
                     queryClient.setQueryData(
                         ["playlistTracks", playlistId],
-                        (oldData: any) => ({
-                            ...oldData,
-                            pages: [
-                                {
-                                    items: sortedAndFilteredTracks.filter(
-                                        (item) =>
-                                            !deletedTracks.has(item.track.uri)
-                                    ),
-                                },
-                            ],
-                        })
+                        (oldData: unknown) => {
+                            if (oldData && typeof oldData === "object") {
+                                return {
+                                    ...oldData,
+                                    pages: [
+                                        {
+                                            items: sortedAndFilteredTracks.filter(
+                                                (item) =>
+                                                    !deletedTracks.has(
+                                                        item.track.uri
+                                                    )
+                                            ),
+                                        },
+                                    ],
+                                };
+                            }
+                            return oldData;
+                        }
                     );
 
                     toast({
@@ -316,9 +327,16 @@ const TrackList: React.FC<TrackListProps> = ({
                         description:
                             "Playlist updated with the new track order and deletions.",
                     });
-                } catch (error: any) {
+                } catch (error: unknown) {
                     console.error("Spotify API Error:", error);
-                    if (error.response?.status === 403) {
+                    if (
+                        error instanceof Error &&
+                        "response" in error &&
+                        typeof error.response === "object" &&
+                        error.response &&
+                        "status" in error.response &&
+                        error.response.status === 403
+                    ) {
                         throw new Error(
                             "You don't have permission to modify this playlist. Please check your Spotify account permissions."
                         );
@@ -330,13 +348,14 @@ const TrackList: React.FC<TrackListProps> = ({
 
             setDeletedTracks(new Set());
             onPlaylistUpdate();
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Error saving playlist:", error);
             toast({
                 title: "Error",
                 description:
-                    error.message ||
-                    "Failed to save the playlist. Please try again.",
+                    error instanceof Error
+                        ? error.message
+                        : "Failed to save the playlist. Please try again.",
                 variant: "destructive",
             });
         }
@@ -378,20 +397,29 @@ const TrackList: React.FC<TrackListProps> = ({
             });
 
             // Update the local state
-            const updatedTracks = tracks.filter(
-                (item) => item.track.uri !== trackUri
-            );
             queryClient.setQueryData(
                 ["playlistTracks", playlistId],
-                (oldData: any) => ({
-                    ...oldData,
-                    pages: oldData.pages.map((page: any) => ({
-                        ...page,
-                        items: page.items.filter(
-                            (item: any) => item.track.uri !== trackUri
-                        ),
-                    })),
-                })
+                (oldData: unknown) => {
+                    if (
+                        typeof oldData === "object" &&
+                        oldData !== null &&
+                        "pages" in oldData
+                    ) {
+                        return {
+                            ...oldData,
+                            pages: (oldData.pages as any[]).map(
+                                (page: any) => ({
+                                    ...page,
+                                    items: page.items.filter(
+                                        (item: SpotifyTrack) =>
+                                            item.track.uri !== trackUri
+                                    ),
+                                })
+                            ),
+                        };
+                    }
+                    return oldData;
+                }
             );
 
             // Call onPlaylistUpdate after successful deletion
@@ -404,7 +432,6 @@ const TrackList: React.FC<TrackListProps> = ({
                 variant: "destructive",
             });
         }
-        setTrackToDelete(null);
     };
 
     const toggleTrackSelection = (trackUri: string) => {
@@ -479,7 +506,7 @@ const TrackList: React.FC<TrackListProps> = ({
     };
 
     const sortedAndFilteredTracks = React.useMemo(() => {
-        let tracksToSort =
+        const tracksToSort =
             filteredTracks.length > 0 ? filteredTracks : allTracks;
 
         let sortedTracks = tracksToSort.filter(
@@ -487,7 +514,7 @@ const TrackList: React.FC<TrackListProps> = ({
         );
 
         // Apply sorting
-        sortedTracks.sort((a, b) => {
+        sortedTracks.sort((a: SpotifyTrack, b: SpotifyTrack) => {
             let aValue, bValue;
             switch (sortField) {
                 case "number":
@@ -495,28 +522,28 @@ const TrackList: React.FC<TrackListProps> = ({
                     bValue = b.originalIndex;
                     break;
                 case "title":
-                    aValue = a.track?.name?.toLowerCase() || "";
-                    bValue = b.track?.name?.toLowerCase() || "";
+                    aValue = a.track.name.toLowerCase();
+                    bValue = b.track.name.toLowerCase();
                     break;
                 case "album":
-                    aValue = a.track?.album?.name?.toLowerCase() || "";
-                    bValue = b.track?.album?.name?.toLowerCase() || "";
+                    aValue = a.track.album.name.toLowerCase();
+                    bValue = b.track.album.name.toLowerCase();
                     break;
                 case "date":
-                    aValue = new Date(
-                        a.track?.album?.release_date || 0
-                    ).getTime();
-                    bValue = new Date(
-                        b.track?.album?.release_date || 0
-                    ).getTime();
+                    aValue = new Date(a.track.album.release_date).getTime();
+                    bValue = new Date(b.track.album.release_date).getTime();
                     break;
                 case "bpm":
-                    aValue = audioFeatures[a.track.id]?.tempo || 0;
-                    bValue = audioFeatures[b.track.id]?.tempo || 0;
+                    aValue =
+                        (audioFeatures[a.track.id] as AudioFeatures)?.tempo ||
+                        0;
+                    bValue =
+                        (audioFeatures[b.track.id] as AudioFeatures)?.tempo ||
+                        0;
                     break;
                 case "duration":
-                    aValue = a.track?.duration_ms || 0;
-                    bValue = b.track?.duration_ms || 0;
+                    aValue = a.track.duration_ms;
+                    bValue = b.track.duration_ms;
                     break;
                 default:
                     return 0;
@@ -581,7 +608,10 @@ const TrackList: React.FC<TrackListProps> = ({
             <div style={style}>
                 <TrackItem
                     key={`${item.track.id}-${item.originalIndex}`}
-                    item={item}
+                    item={{
+                        track: item.track,
+                        originalIndex: item.originalIndex,
+                    }}
                     originalIndex={item.originalIndex}
                     isMultiSelectMode={isMultiSelectMode}
                     selectedTracks={selectedTracks}
@@ -597,7 +627,9 @@ const TrackList: React.FC<TrackListProps> = ({
                         (ft) => ft.track.id === item.track.id
                     )}
                     isDeleted={deletedTracks.has(item.track.uri)}
-                    audioFeatures={audioFeatures[item.track.id]}
+                    audioFeatures={
+                        audioFeatures[item.track.id] as AudioFeatures
+                    }
                 />
             </div>
         );
