@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
-import { SpotifyTrack, AudioFeatures } from "@/types/spotify";
+import { AudioFeatures } from "@/types/spotify";
 
 interface TrackItemProps {
     item: {

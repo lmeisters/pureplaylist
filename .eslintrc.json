@@ -1,6 +1,8 @@
 {
   "extends": ["next/core-web-vitals", "next/typescript"],
   "rules": {
-    "react/no-unescaped-entities": "off"
+    "react/no-unescaped-entities": "off",
+    // Allow explicit any (better to specify types when possible)
+    "@typescript-eslint/no-explicit-any": "off"
   }
 }

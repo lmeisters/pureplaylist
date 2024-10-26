@@ -61,12 +61,11 @@ const TrackList: React.FC<TrackListProps> = ({
     const queryClient = useQueryClient();
     const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>({
         titleKeywords: [],
-        genres: [],
+        albums: [],
         artists: [],
     });
 
     const {
-        data,
         fetchNextPage,
         hasNextPage,
         isLoading,
@@ -104,7 +103,7 @@ const TrackList: React.FC<TrackListProps> = ({
 
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 
-    const { ref, inView } = useInView();
+    const { inView } = useInView();
     const { data: session } = useSession() as { data: ExtendedSession | null };
     const { toast } = useToast();
 
@@ -122,49 +121,6 @@ const TrackList: React.FC<TrackListProps> = ({
         setSortField("number");
         setSortOrder("asc");
     }, [playlistId]);
-
-    const tracks = data?.pages.flatMap((page) => page.items) || [];
-
-    const sortedTracks = [...tracks].sort(
-        (a: SpotifyTrack, b: SpotifyTrack) => {
-            let aValue, bValue;
-            switch (sortField) {
-                case "number":
-                    aValue = a.originalIndex;
-                    bValue = b.originalIndex;
-                    break;
-                case "title":
-                    aValue = a.track.name.toLowerCase();
-                    bValue = b.track.name.toLowerCase();
-                    break;
-                case "album":
-                    aValue = a.track.album.name.toLowerCase();
-                    bValue = b.track.album.name.toLowerCase();
-                    break;
-                case "date":
-                    aValue = new Date(a.track.album.release_date).getTime();
-                    bValue = new Date(b.track.album.release_date).getTime();
-                    break;
-                case "bpm":
-                    aValue =
-                        (audioFeatures[a.track.id] as AudioFeatures)?.tempo ||
-                        0;
-                    bValue =
-                        (audioFeatures[b.track.id] as AudioFeatures)?.tempo ||
-                        0;
-                    break;
-                case "duration":
-                    aValue = a.track.duration_ms;
-                    bValue = b.track.duration_ms;
-                    break;
-                default:
-                    return 0;
-            }
-            if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
-            if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
-            return 0;
-        }
-    );
 
     const toggleSort = (field: SortField) => {
         if (field === sortField) {
@@ -468,7 +424,7 @@ const TrackList: React.FC<TrackListProps> = ({
     const clearFilters = () => {
         setFilterCriteria({
             titleKeywords: [],
-            genres: [],
+            albums: [],
             artists: [],
         });
     };

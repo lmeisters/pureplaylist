@@ -20,7 +20,7 @@ interface FilterTabProps {
 
 export interface FilterCriteria {
     titleKeywords: string[];
-    genres: string[];
+    albums: string[]; // Changed from genres to albums
     artists: string[];
 }
 
@@ -32,12 +32,12 @@ export function FilterTab({
     initialFilters,
 }: FilterTabProps) {
     const [titleKeywordInput, setTitleKeywordInput] = useState("");
-    const [genreInput, setGenreInput] = useState("");
+    const [albumInput, setAlbumInput] = useState(""); // Changed from genreInput
     const [artistInput, setArtistInput] = useState("");
 
     useEffect(() => {
         setTitleKeywordInput(initialFilters.titleKeywords.join(", "));
-        setGenreInput(initialFilters.genres.join(", "));
+        setAlbumInput(initialFilters.albums.join(", ")); // Changed from genres to albums
         setArtistInput(initialFilters.artists.join(", "));
     }, [initialFilters, isOpen]);
 
@@ -47,9 +47,9 @@ export function FilterTab({
                 .split(",")
                 .map((k) => k.trim())
                 .filter(Boolean),
-            genres: genreInput
+            albums: albumInput // Changed from genres to albums
                 .split(",")
-                .map((g) => g.trim())
+                .map((a) => a.trim())
                 .filter(Boolean),
             artists: artistInput
                 .split(",")
@@ -68,7 +68,7 @@ export function FilterTab({
 
     const handleClearFilters = () => {
         setTitleKeywordInput("");
-        setGenreInput("");
+        setAlbumInput("");
         setArtistInput("");
         onClearFilters();
         onClose();
@@ -106,17 +106,17 @@ export function FilterTab({
                     </div>
                     <div>
                         <label
-                            htmlFor="genres"
+                            htmlFor="albums"
                             className="block text-sm font-medium text-gray-700"
                         >
-                            Genres
+                            Albums
                         </label>
                         <Input
-                            id="genres"
-                            value={genreInput}
-                            onChange={(e) => setGenreInput(e.target.value)}
+                            id="albums"
+                            value={albumInput}
+                            onChange={(e) => setAlbumInput(e.target.value)}
                             onKeyDown={handleKeyDown}
-                            placeholder="trance, metal"
+                            placeholder="The Dark Side of the Moon, Thriller"
                         />
                     </div>
                     <div>

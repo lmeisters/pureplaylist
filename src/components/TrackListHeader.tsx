@@ -21,8 +21,6 @@ interface TrackListHeaderProps {
 }
 
 export const TrackListHeader: React.FC<TrackListHeaderProps> = ({
-    isMultiSelectMode,
-    toggleMultiSelectMode,
     selectedTracksCount,
     setIsDialogOpen,
     savePlaylist,
@@ -32,9 +30,7 @@ export const TrackListHeader: React.FC<TrackListHeaderProps> = ({
     onOpenFilterModal,
     deleteFilteredTracks,
     playlistName,
-    onApplyFilters,
     deleteSelectedTracks,
-    playlistDetails,
 }) => {
     return (
         <div className="p-4 font-semibold border-b flex flex-col md:flex-row justify-between items-start md:items-center space-y-2 md:space-y-0">
