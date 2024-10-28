@@ -2,11 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Remove or comment out this block */
-/* body {
-  font-family: Arial, Helvetica, sans-serif;
-} */
-
 @layer utilities {
     .text-balance {
         text-wrap: balance;

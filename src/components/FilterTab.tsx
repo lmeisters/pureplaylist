@@ -20,7 +20,7 @@ interface FilterTabProps {
 
 export interface FilterCriteria {
     titleKeywords: string[];
-    albums: string[]; // Changed from genres to albums
+    albums: string[];
     artists: string[];
 }
 
@@ -32,12 +32,12 @@ export function FilterTab({
     initialFilters,
 }: FilterTabProps) {
     const [titleKeywordInput, setTitleKeywordInput] = useState("");
-    const [albumInput, setAlbumInput] = useState(""); // Changed from genreInput
+    const [albumInput, setAlbumInput] = useState("");
     const [artistInput, setArtistInput] = useState("");
 
     useEffect(() => {
         setTitleKeywordInput(initialFilters.titleKeywords.join(", "));
-        setAlbumInput(initialFilters.albums.join(", ")); // Changed from genres to albums
+        setAlbumInput(initialFilters.albums.join(", "));
         setArtistInput(initialFilters.artists.join(", "));
     }, [initialFilters, isOpen]);
 
@@ -47,7 +47,7 @@ export function FilterTab({
                 .split(",")
                 .map((k) => k.trim())
                 .filter(Boolean),
-            albums: albumInput // Changed from genres to albums
+            albums: albumInput
                 .split(",")
                 .map((a) => a.trim())
                 .filter(Boolean),

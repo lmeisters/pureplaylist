@@ -12,7 +12,6 @@ export interface PlaylistDetails {
     owner: {
         id: string;
     };
-    // Add other properties as needed
 }
 
 export interface SpotifyTrack {
@@ -34,7 +33,6 @@ export interface SpotifyTrack {
 export interface AudioFeatures {
     id: string;
     tempo: number;
-    // Add other audio features as needed
 }
 
 export interface SpotifyPlaylist {
@@ -44,5 +42,4 @@ export interface SpotifyPlaylist {
     tracks: {
         total: number;
     };
-    // Add any other properties that you need from the Spotify API playlist object
 }

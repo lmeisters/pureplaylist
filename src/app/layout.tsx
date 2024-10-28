@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     openGraph: {
         title: "PurePlaylist",
         description: "Organize and manage your Spotify playlists with ease",
-        // url: "https://pureplaylist.com",
+        url: "https://pureplaylist.vercel.app",
         siteName: "PurePlaylist",
         // images: [
         //     {
