@@ -1,12 +1,13 @@
 import { Button } from "@/components/ui/button";
+import { Section } from "@/components/ui/section";
 import { Music } from "lucide-react";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
 
 function HeroSection() {
     return (
-        <section className="flex flex-col items-center justify-center bg-gradient-to-b from-background to-secondary min-h-screen">
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center mt-40">
+        <Section>
+            <div className="flex flex-col items-center text-center">
                 <h1 className="text-4xl font-bold tracking-tight sm:text-6xl mb-4">
                     Curating Spotify Playlists with Precision
                 </h1>
@@ -25,18 +26,19 @@ function HeroSection() {
                         Learn more
                     </Button>
                 </div>
+
+                <div className="relative w-full aspect-video max-w-[1280px] max-h-[720px] rounded-lg overflow-hidden shadow-xl mt-12">
+                    <Image
+                        src="/app-screenshot.webp"
+                        alt="PurePlaylist App Screenshot"
+                        width={1280}
+                        height={720}
+                        className="object-cover rounded-lg border-2 border-border"
+                        priority
+                    />
+                </div>
             </div>
-            <div className="relative w-full aspect-video max-w-[1280px] max-h-[720px] rounded-lg overflow-hidden shadow-xl mt-12">
-                <Image
-                    src="/app-screenshot.webp"
-                    alt="PurePlaylist App Screenshot"
-                    width={1280}
-                    height={720}
-                    className="object-cover rounded-lg border-2 border-border"
-                    priority
-                />
-            </div>
-        </section>
+        </Section>
     );
 }
 
