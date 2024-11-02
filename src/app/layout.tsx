@@ -18,6 +18,13 @@ export const metadata: Metadata = {
     description: "Organize and manage your Spotify playlists with ease",
     keywords: ["Spotify", "playlist", "music", "organization"],
     authors: [{ name: "Linards M." }],
+    icons: {
+        icon: [
+            { url: "/favicon.ico" },
+            { url: "/icon.png", type: "image/png" },
+        ],
+        apple: [{ url: "/apple-icon.png", type: "image/png" }],
+    },
     openGraph: {
         title: "PurePlaylist",
         description: "Organize and manage your Spotify playlists with ease",

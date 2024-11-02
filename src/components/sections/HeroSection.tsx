@@ -6,7 +6,7 @@ import { signIn } from "next-auth/react";
 
 function HeroSection() {
     return (
-        <Section>
+        <Section variant="default">
             <div className="flex flex-col items-center text-center">
                 <div className="inline-flex items-center rounded-full border px-4 py-1.5 mb-8 bg-background">
                     <span className="relative flex h-2 w-2 mr-2">

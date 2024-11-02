@@ -1,13 +1,17 @@
 import { Section } from "@/components/ui/section";
+import { Badge } from "../ui/badge";
 
 function AboutSection() {
     return (
-        <Section>
+        <Section variant="gray">
             <div className="flex flex-col items-center text-center">
-                <h1 className="text-2xl font-bold tracking-tight sm:text-4xl mb-4">
-                    About PurePlaylist
-                </h1>
-                <p className="text-lg mb-4">
+                <div className="text-center space-y-4">
+                    <Badge variant="secondary">About</Badge>
+                    <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+                        About PurePlaylist
+                    </h2>
+                </div>
+                <p className="text-lg mb-4 mt-6">
                     PurePlaylist is a web application that enables users to
                     filter their Spotify playlists by keywords, genres, and
                     artists. Built with modern technologies like React, Next.js,

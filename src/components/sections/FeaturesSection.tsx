@@ -32,7 +32,7 @@ function FeaturesSection() {
     ];
 
     return (
-        <Section containerWidth="wide" className="py-24">
+        <Section containerWidth="wide" className="py-24" variant="gray">
             <div className="text-center space-y-4">
                 <Badge variant="secondary">Features</Badge>
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
