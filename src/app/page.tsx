@@ -26,8 +26,8 @@ function HomeContent() {
             <div className="h-full overflow-auto">
                 <HeroSection />
                 <AboutSection />
-                <HowItWorksSection />
                 <FeaturesSection />
+                <HowItWorksSection />
                 <FAQSection />
                 <CTASection />
                 <FooterSection />
