@@ -1,64 +1,92 @@
 import { Section } from "@/components/ui/section";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
-import { ArrowRight, LogIn, Filter, Save } from "lucide-react";
 
 function HowItWorksSection() {
     const steps = [
         {
-            title: "Sign In",
-            description:
-                "Connect your Spotify account securely with just one click",
-            icon: <LogIn className="h-6 w-6" />,
+            title: "Connect to Spotify",
+            description: "Easily link your Spotify account to get started.",
+            image: "/images/connect-spotify.webp",
         },
         {
-            title: "Select & Filter",
-            description:
-                "Choose a playlist and apply filters by keywords, artists, or genres",
-            icon: <Filter className="h-6 w-6" />,
+            title: "Select Your Playlist",
+            description: "Pick a playlist you'd like to refine.",
+            image: "/images/select-playlist.webp",
         },
         {
-            title: "Save Changes",
-            description:
-                "Update existing playlist or create a new filtered version",
-            icon: <Save className="h-6 w-6" />,
+            title: "Filter & Customize",
+            description: "Apply filters to create your ideal mix.",
+            image: "/images/filter-customize.webp",
+        },
+        {
+            title: "Save & Enjoy",
+            description: "Save your personalized playlist and start listening!",
+            image: "/images/save-enjoy.webp",
         },
     ];
 
     return (
-        <Section variant="gray">
-            <div className="flex flex-col items-center text-center">
-                <div className="text-center space-y-4">
-                    <Badge variant="secondary">How It Works</Badge>
-                    <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+        <Section containerWidth="wide" variant="gray">
+            <div>
+                <div className="space-y-3 text-center">
+                    <Badge variant="outline">HOW IT WORKS</Badge>
+                    <h2 className="text-3xl tracking-tighter sm:text-4xl md:text-5xl">
                         Simple Steps to Organize Your Music
                     </h2>
                 </div>
 
-                <div className="grid gap-6 mt-8 md:grid-cols-3">
-                    {steps.map((step, index) => (
-                        <Card
-                            key={step.title}
-                            className="relative p-6 text-left"
-                        >
-                            <div className="space-y-4">
-                                <div className="p-2 w-fit rounded-lg bg-secondary">
-                                    {step.icon}
+                <div className="mt-16 relative">
+                    <div className="hidden md:block absolute left-1/2 -top-8 h-[calc(100%+6rem)] w-px bg-gradient-to-b from-transparent via-gray-400 to-transparent -translate-x-1/2" />
+
+                    <div className="space-y-16">
+                        {steps.map((step, index) => (
+                            <div key={step.title} className="relative">
+                                {index > 0 && (
+                                    <div className="absolute left-1/2 -top-16 h-16 w-px bg-gradient-to-b from-transparent via-gray-400 to-gray-400 -translate-x-1/2 md:hidden" />
+                                )}
+
+                                <div
+                                    className="absolute left-1/2 top-0 -translate-x-1/2 md:top-1/2 md:-translate-y-1/2 w-8 h-8 rounded-full 
+                                    bg-gradient-to-b from-gray-50 to-gray-100 
+                                    shadow-[inset_0_-1px_2px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.05)] 
+                                    flex items-center justify-center z-10 
+                                    border border-gray-200"
+                                >
+                                    <span className="text-base font-semibold text-gray-700">
+                                        {index + 1}
+                                    </span>
                                 </div>
-                                <h3 className="font-semibold text-xl">
-                                    {step.title}
-                                </h3>
-                                <p className="text-muted-foreground">
-                                    {step.description}
-                                </p>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center pt-16 md:pt-0">
+                                    <div
+                                        className={`px-4 md:px-12 ${
+                                            index % 2 === 1 ? "md:order-2" : ""
+                                        }`}
+                                    >
+                                        <h3 className="text-semibold text-2xl mb-1">
+                                            {step.title}
+                                        </h3>
+                                        <p className="text-muted-foreground text-md">
+                                            {step.description}
+                                        </p>
+                                    </div>
+                                    <div
+                                        className={`px-4 md:px-12 ${
+                                            index % 2 === 1 ? "md:order-1" : ""
+                                        }`}
+                                    >
+                                        <div className="aspect-video w-full overflow-hidden rounded-md bg-muted">
+                                            <img
+                                                src={step.image}
+                                                alt={step.title}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            {index < steps.length - 1 && (
-                                <div className="hidden md:block absolute -right-3 top-1/2 transform -translate-y-1/2 z-10">
-                                    <ArrowRight className="h-6 w-6 text-muted-foreground" />
-                                </div>
-                            )}
-                        </Card>
-                    ))}
+                        ))}
+                    </div>
                 </div>
             </div>
         </Section>
