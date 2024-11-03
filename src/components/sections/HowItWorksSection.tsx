@@ -26,7 +26,7 @@ function HowItWorksSection() {
     ];
 
     return (
-        <Section containerWidth="wide" variant="gray">
+        <Section containerWidth="wide" variant="gray" id="how-it-works">
             <div>
                 <div className="space-y-3 text-center">
                     <Badge variant="outline">HOW IT WORKS</Badge>

@@ -3,7 +3,7 @@ import { Badge } from "../ui/badge";
 
 function AboutSection() {
     return (
-        <Section variant="gray">
+        <Section variant="gray" id="about">
             <div className="flex flex-col items-center text-center">
                 <div className="text-center space-y-4">
                     <Badge variant="secondary">About</Badge>

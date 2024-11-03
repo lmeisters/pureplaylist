@@ -71,7 +71,12 @@ function FeaturesSection() {
     ];
 
     return (
-        <Section containerWidth="wide" className="py-24" variant="gray">
+        <Section
+            containerWidth="wide"
+            className="py-24"
+            variant="gray"
+            id="features"
+        >
             <div className="space-y-4">
                 <Badge variant="outline">FEATURES</Badge>
                 <h2 className="text-3xl tracking-tighter sm:text-4xl md:text-5xl">
