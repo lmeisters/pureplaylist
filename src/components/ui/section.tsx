@@ -27,7 +27,7 @@ export function Section({
                 !noPaddingTop && "pt-20",
                 size === "default" ? "min-h-screen" : "min-h-[50vh]",
                 variant === "default" && "bg-background/50",
-                variant === "gray" && "bg-secondary/50",
+                variant === "gray" && "bg-secondary/30",
                 variant === "dark" && "bg-black text-white",
                 variant === "footer" && "min-h-[35vh] bg-black text-white",
                 allowOverflow && "overflow-visible",

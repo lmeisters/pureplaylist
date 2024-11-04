@@ -32,7 +32,15 @@ function HeroSection() {
                         <Music className="mr-2 h-5 w-5" />
                         Sign in with Spotify
                     </Button>
-                    <Button size="lg" variant="ghost">
+                    <Button
+                        size="lg"
+                        variant="ghost"
+                        onClick={() => {
+                            document.getElementById("about")?.scrollIntoView({
+                                behavior: "smooth",
+                            });
+                        }}
+                    >
                         Learn more
                     </Button>
                 </div>
