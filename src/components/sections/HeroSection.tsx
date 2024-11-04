@@ -6,7 +6,12 @@ import { signIn } from "next-auth/react";
 
 function HeroSection() {
     return (
-        <Section variant="default" allowOverflow className="pt-32 sm:pt-36">
+        <Section
+            variant="default"
+            allowOverflow
+            className="pt-32 sm:pt-36"
+            id="hero"
+        >
             <div className="flex flex-col items-center text-center">
                 <div className="inline-flex items-center rounded-full border px-4 py-1.5 mb-8 bg-background">
                     <span className="relative flex h-2 w-2 mr-2">

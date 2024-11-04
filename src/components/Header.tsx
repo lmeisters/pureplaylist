@@ -37,8 +37,8 @@ function Header() {
     }, [status, router]);
 
     return (
-        <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-4xl mx-auto px-4">
-            <div className="w-full bg-background/80 backdrop-blur-sm border rounded-lg flex justify-between items-center py-2 px-4">
+        <header className="bg-background border-b">
+            <div className="w-full px-4 sm:px-4 flex justify-between items-center py-2">
                 <div className="flex items-center space-x-2">
                     <Image
                         src="/icon.png"
