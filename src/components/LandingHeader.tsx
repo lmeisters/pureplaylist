@@ -30,17 +30,19 @@ function LandingHeader() {
     };
 
     return (
-        <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b">
-            <div className="w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex justify-between items-center py-4">
-                <Link href="/" className="flex items-center space-x-2">
-                    <Image
-                        src="/icon.png"
-                        alt="PurePlaylist"
-                        width={32}
-                        height={32}
-                    />
-                    <h1 className="text-xl font-semibold">PurePlaylist</h1>
-                </Link>
+        <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-4xl mx-auto px-4">
+            <div className="w-full bg-background/80 backdrop-blur-sm border rounded-lg flex justify-between items-center py-2 px-4">
+                <div className="flex items-center space-x-2">
+                    <Link href="/" className="flex items-center space-x-2">
+                        <Image
+                            src="/icon.png"
+                            alt="PurePlaylist"
+                            width={24}
+                            height={24}
+                        />
+                        <h1 className="text-xl font-semibold">PurePlaylist</h1>
+                    </Link>
+                </div>
                 <nav className="hidden md:flex items-center space-x-8 mr-8">
                     <Link
                         href="#about"
@@ -59,6 +61,12 @@ function LandingHeader() {
                         className="text-sm text-muted-foreground hover:text-foreground transition"
                     >
                         How It Works
+                    </Link>
+                    <Link
+                        href="#how-it-works"
+                        className="text-sm text-muted-foreground hover:text-foreground transition"
+                    >
+                        FAQ
                     </Link>
                 </nav>
                 <Button
