@@ -83,6 +83,25 @@ const config: Config = {
   			"accordion-down": "accordion-down 0.2s ease-out",
   			"accordion-up": "accordion-up 0.2s ease-out",
   		},
+  		screens: {
+  			'sm': '640px',
+  			'md': '768px',
+  			'lg': '1024px',
+  			'xl': '1280px',
+  			'2xl': '1536px',
+  			'3xl': '1920px',
+  			'4xl': '2560px',
+  		},
+  		maxWidth: {
+  			'5xl': '64rem',  // 1024px
+  			'6xl': '72rem',  // 1152px
+  			'7xl': '80rem',  // 1280px
+  			'8xl': '88rem',  // 1408px
+  			'9xl': '96rem',  // 1536px
+  		},
+  		padding: {
+  			container: 'max(1rem, calc((100vw - var(--container-max-width)) / 2))',
+  		},
   	}
   },
   plugins: [require("tailwindcss-animate")],

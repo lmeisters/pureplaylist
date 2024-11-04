@@ -16,6 +16,7 @@ function FooterSection() {
             variant="footer"
             size="half"
             containerWidth="wide"
+            className="rounded-t-3xl"
         >
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 pb-2 sm:pb-4">
                 {/* About Section */}

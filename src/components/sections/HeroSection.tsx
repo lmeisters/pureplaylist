@@ -6,7 +6,7 @@ import { signIn } from "next-auth/react";
 
 function HeroSection() {
     return (
-        <Section variant="default">
+        <Section variant="default" allowOverflow>
             <div className="flex flex-col items-center text-center">
                 <div className="inline-flex items-center rounded-full border px-4 py-1.5 mb-8 bg-background">
                     <span className="relative flex h-2 w-2 mr-2">
@@ -37,12 +37,12 @@ function HeroSection() {
                     </Button>
                 </div>
 
-                <div className="relative w-full aspect-video max-w-[1280px] max-h-[720px] rounded-lg overflow-hidden shadow-xl mt-12">
+                <div className="relative w-[95vw] aspect-video max-w-[1440px] max-h-[810px] rounded-lg overflow-hidden shadow-xl mt-12">
                     <Image
                         src="/app-screenshot.webp"
                         alt="PurePlaylist App Screenshot"
-                        width={1280}
-                        height={720}
+                        width={1440}
+                        height={810}
                         className="object-cover rounded-lg border-2 border-border"
                         priority
                     />

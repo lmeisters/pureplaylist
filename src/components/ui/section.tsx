@@ -2,10 +2,11 @@ import { cn } from "@/lib/utils";
 
 interface SectionProps extends React.HTMLAttributes<HTMLElement> {
     children: React.ReactNode;
-    containerWidth?: "default" | "wide";
+    containerWidth?: "default" | "wide" | "full";
     variant?: "default" | "gray" | "dark" | "footer";
     size?: "default" | "half";
     noPaddingTop?: boolean;
+    allowOverflow?: boolean;
 }
 
 export function Section({
@@ -15,26 +16,32 @@ export function Section({
     variant = "default",
     size = "default",
     noPaddingTop = false,
+    allowOverflow = false,
     ...props
 }: SectionProps) {
     return (
         <section
             className={cn(
-                "flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8",
+                "relative flex flex-col items-center justify-center",
+                "px-4 sm:px-6 lg:px-8 2xl:px-0",
                 !noPaddingTop && "pt-20",
                 size === "default" ? "min-h-screen" : "min-h-[50vh]",
                 variant === "default" && "bg-background/50",
                 variant === "gray" && "bg-secondary/50",
                 variant === "dark" && "bg-black text-white",
                 variant === "footer" && "min-h-[35vh] bg-black text-white",
+                allowOverflow && "overflow-visible",
                 className
             )}
             {...props}
         >
             <div
                 className={cn(
-                    "mx-auto w-full",
-                    containerWidth === "default" ? "max-w-4xl" : "max-w-6xl"
+                    "relative w-full mx-auto",
+                    containerWidth === "default" && "max-w-4xl",
+                    containerWidth === "wide" && "max-w-6xl",
+                    containerWidth === "full" && "max-w-[1920px]",
+                    allowOverflow && "overflow-visible"
                 )}
             >
                 {children}

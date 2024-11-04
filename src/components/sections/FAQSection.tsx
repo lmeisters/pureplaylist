@@ -28,7 +28,7 @@ function FAQSection() {
     ];
 
     return (
-        <Section variant="gray" id="faq">
+        <Section variant="gray" id="faq" size="half">
             <div className="flex flex-col items-center">
                 <div className="text-center space-y-4 mb-8">
                     <Badge variant="secondary">FAQ</Badge>
