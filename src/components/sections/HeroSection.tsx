@@ -70,7 +70,7 @@ function HeroSection() {
 
                 <AnimatedElement
                     index={4}
-                    className="relative w-[95vw] aspect-video max-w-[1440px] max-h-[700px] rounded-lg overflow-hidden shadow-xl mt-12"
+                    className="relative w-[95vw] aspect-video max-w-[1440px] max-h-[700px] rounded-lg overflow-hidden shadow-2xl mt-12 border-2 border-white/20 ring-4 ring-offset-2 ring-white/[0.03] ring-offset-background before:absolute before:inset-0 before:ring-1 before:ring-inset before:ring-gray-900/10 after:absolute after:inset-0 after:ring-1 after:ring-gray-900/10"
                     variants={{
                         hidden: { y: -20, opacity: 0 },
                         visible: {
@@ -87,9 +87,10 @@ function HeroSection() {
                     <Image
                         src="/app-screenshot.webp"
                         alt="PurePlaylist App Screenshot"
-                        width={1440}
-                        height={810}
-                        className="object-cover rounded-lg border-2 border-border"
+                        width={2880}
+                        height={1620}
+                        className="object-cover"
+                        quality={100}
                         priority
                     />
                     <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-background to-transparent" />

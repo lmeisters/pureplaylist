@@ -23,14 +23,17 @@ export function Section({
         <section
             className={cn(
                 "relative flex flex-col items-center justify-center",
-                "px-4 sm:px-8 lg:px-16",
-                !noPaddingTop && "pt-16 pb-16 sm:pt-28 sm:pb-28",
-                size === "default" ? "min-h-screen" : "min-h-[50vh]",
+                "px-4 sm:px-8 lg:px-12",
+                "w-full max-w-[2000px] mx-auto",
+                !noPaddingTop && "pt-12 pb-12 sm:pt-32 sm:pb-32",
+                size === "default"
+                    ? "min-h-[400px] sm:min-h-[600px] lg:min-h-[800px] max-h-none"
+                    : "min-h-[300px] sm:min-h-[350px] lg:min-h-[400px] max-h-none",
                 variant === "default" && "bg-background/50",
                 variant === "gray" && "bg-secondary/30",
                 variant === "dark" && "bg-black text-white",
                 variant === "footer" &&
-                    "min-h-[35vh] bg-black text-white py-8 sm:py-16",
+                    "min-h-[200px] sm:min-h-[250px] lg:min-h-[300px] max-h-none bg-black text-white py-8 sm:py-12",
                 allowOverflow && "overflow-visible",
                 className
             )}
@@ -42,6 +45,7 @@ export function Section({
                     containerWidth === "default" && "max-w-4xl",
                     containerWidth === "wide" && "max-w-6xl",
                     containerWidth === "full" && "max-w-[1920px]",
+                    "px-4 sm:px-6 lg:px-8",
                     allowOverflow && "overflow-visible"
                 )}
             >

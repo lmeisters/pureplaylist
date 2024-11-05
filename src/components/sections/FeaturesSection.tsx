@@ -45,7 +45,7 @@ function FeaturesSection() {
         {
             title: "Instant Track Filtering",
             description:
-                "Filter tracks by keywords, genres, or artists for a personalized playlist experience.",
+                "Filter tracks by keywords, albums, or artists for a personalized experience.",
             image: {
                 src: "/features/track-filtering.webp",
                 alt: "Instant track filtering feature demonstration",
@@ -89,7 +89,7 @@ function FeaturesSection() {
                 </h2>
             </AnimatedElement>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-12 [&>*:nth-child(3)]:md:col-span-2 [&>*:nth-child(6)]:md:col-span-2 lg:[&>*:nth-child(3)]:col-span-1 lg:[&>*:nth-child(6)]:col-span-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-12 lg:[&>*:nth-child(3)]:col-span-1 lg:[&>*:nth-child(6)]:col-span-1">
                 {features.map((feature, index) => (
                     <AnimatedElement
                         key={feature.title}

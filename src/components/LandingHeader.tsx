@@ -39,7 +39,7 @@ function LandingHeader() {
     ];
 
     return (
-        <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-4xl mx-auto px-4">
+        <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl mx-auto px-4">
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{
