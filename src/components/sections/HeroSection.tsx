@@ -3,8 +3,6 @@ import { Section } from "@/components/ui/section";
 import { Music } from "lucide-react";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
-import { motion } from "framer-motion";
-import { fadeInFromBelow, getStaggeredFadeIn } from "@/lib/animations";
 import { AnimatedElement } from "@/components/ui/animated-element";
 
 function HeroSection() {
