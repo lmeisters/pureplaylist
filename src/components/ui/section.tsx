@@ -9,6 +9,21 @@ interface SectionProps extends React.HTMLAttributes<HTMLElement> {
     allowOverflow?: boolean;
 }
 
+const SECTION_SIZES = {
+    default: {
+        height: "min-h-[400px] sm:min-h-[600px] lg:min-h-[800px]",
+        padding: "pt-12 pb-12 sm:pt-32 sm:pb-32",
+    },
+    half: {
+        height: "min-h-[300px] sm:min-h-[350px] lg:min-h-[400px]",
+        padding: "pt-12 pb-12 sm:pt-32 sm:pb-32",
+    },
+    footer: {
+        height: "min-h-[200px] sm:min-h-[250px] lg:min-h-[300px]",
+        padding: "py-8 sm:py-12",
+    },
+} as const;
+
 export function Section({
     children,
     className,
@@ -19,16 +34,18 @@ export function Section({
     allowOverflow = false,
     ...props
 }: SectionProps) {
+    const sizeConfig =
+        variant === "footer" ? SECTION_SIZES.footer : SECTION_SIZES[size];
+
     return (
         <section
             className={cn(
                 "relative flex flex-col items-center justify-center",
                 "px-4 sm:px-8 lg:px-12",
                 "w-full max-w-[2000px] mx-auto",
-                !noPaddingTop && "pt-12 pb-12 sm:pt-32 sm:pb-32",
-                size === "default"
-                    ? "min-h-[400px] sm:min-h-[600px] lg:min-h-[800px] max-h-none"
-                    : "min-h-[300px] sm:min-h-[350px] lg:min-h-[400px] max-h-none",
+                !noPaddingTop && sizeConfig.padding,
+                sizeConfig.height,
+                "max-h-none",
                 variant === "default" && "bg-background/50",
                 variant === "gray" && "bg-secondary/30",
                 variant === "dark" && "bg-black text-white",
