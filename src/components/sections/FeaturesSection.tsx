@@ -77,9 +77,9 @@ function FeaturesSection() {
             variant="gray"
             id="features"
         >
-            <div className="space-y-4">
+            <div className="space-y-4 text-center">
                 <Badge variant="outline">FEATURES</Badge>
-                <h2 className="text-3xl tracking-tighter sm:text-4xl md:text-5xl">
+                <h2 className="text-3xl font-semibold tracking-tighter sm:text-4xl md:text-5xl">
                     Key Features of PurePlaylist
                 </h2>
             </div>

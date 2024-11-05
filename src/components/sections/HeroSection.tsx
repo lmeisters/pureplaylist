@@ -32,7 +32,7 @@ function HeroSection() {
                     the Spotify API.
                 </p>
 
-                <div className="flex space-x-4">
+                <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                     <Button size="lg" onClick={() => signIn("spotify")}>
                         <Music className="mr-2 h-5 w-5" />
                         Sign in with Spotify
@@ -50,7 +50,7 @@ function HeroSection() {
                     </Button>
                 </div>
 
-                <div className="relative w-[95vw] aspect-video max-w-[1440px] max-h-[810px] rounded-lg overflow-hidden shadow-xl mt-12">
+                <div className="relative w-[95vw] aspect-video max-w-[1440px] max-h-[700px] rounded-lg overflow-hidden shadow-xl mt-12">
                     <Image
                         src="/app-screenshot.webp"
                         alt="PurePlaylist App Screenshot"
@@ -59,6 +59,7 @@ function HeroSection() {
                         className="object-cover rounded-lg border-2 border-border"
                         priority
                     />
+                    <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-background to-transparent" />
                 </div>
             </div>
         </Section>

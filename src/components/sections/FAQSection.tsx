@@ -31,8 +31,8 @@ function FAQSection() {
         <Section variant="gray" id="faq" size="half">
             <div className="flex flex-col items-center">
                 <div className="text-center space-y-4 mb-8">
-                    <Badge variant="secondary">FAQ</Badge>
-                    <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+                    <Badge variant="outline">FAQ</Badge>
+                    <h2 className="text-3xl font-semibold tracking-tighter sm:text-4xl md:text-5xl">
                         Frequently Asked Questions
                     </h2>
                 </div>

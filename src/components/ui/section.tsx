@@ -23,13 +23,14 @@ export function Section({
         <section
             className={cn(
                 "relative flex flex-col items-center justify-center",
-                "px-8 lg:px-16",
-                !noPaddingTop && "pt-28 pb-28",
+                "px-4 sm:px-8 lg:px-16",
+                !noPaddingTop && "pt-16 pb-16 sm:pt-28 sm:pb-28",
                 size === "default" ? "min-h-screen" : "min-h-[50vh]",
                 variant === "default" && "bg-background/50",
                 variant === "gray" && "bg-secondary/30",
                 variant === "dark" && "bg-black text-white",
-                variant === "footer" && "min-h-[35vh] bg-black text-white",
+                variant === "footer" &&
+                    "min-h-[35vh] bg-black text-white py-8 sm:py-16",
                 allowOverflow && "overflow-visible",
                 className
             )}

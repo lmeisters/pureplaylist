@@ -30,7 +30,7 @@ function HowItWorksSection() {
             <div>
                 <div className="space-y-3 text-center">
                     <Badge variant="outline">HOW IT WORKS</Badge>
-                    <h2 className="text-3xl tracking-tighter sm:text-4xl md:text-5xl">
+                    <h2 className="text-3xl font-semibold tracking-tighter sm:text-4xl md:text-5xl">
                         Simple Steps to Organize Your Music
                     </h2>
                 </div>
@@ -41,9 +41,7 @@ function HowItWorksSection() {
                     <div className="space-y-16">
                         {steps.map((step, index) => (
                             <div key={step.title} className="relative">
-                                {index > 0 && (
-                                    <div className="absolute left-1/2 -top-16 h-16 w-px bg-gradient-to-b from-transparent via-gray-400 to-gray-400 -translate-x-1/2 md:hidden" />
-                                )}
+                                <div className="absolute left-1/2 -top-16 h-16 w-px bg-gradient-to-b from-transparent via-gray-400 to-gray-400 -translate-x-1/2 md:hidden" />
 
                                 <div
                                     className="absolute left-1/2 top-0 -translate-x-1/2 md:top-1/2 md:-translate-y-1/2 w-8 h-8 rounded-full 
