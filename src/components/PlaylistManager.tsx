@@ -235,7 +235,7 @@ const PlaylistManager = () => {
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="ml-auto"
+                                        className="ml-auto flex-shrink-0"
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             toggleFavorite(playlist.id);
