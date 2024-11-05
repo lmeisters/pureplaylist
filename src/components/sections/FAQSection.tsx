@@ -6,6 +6,7 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "@/components/ui/accordion";
+import { AnimatedElement } from "@/components/ui/animated-element";
 
 function FAQSection() {
     const faqs = [
@@ -30,24 +31,34 @@ function FAQSection() {
     return (
         <Section variant="gray" id="faq" size="half">
             <div className="flex flex-col items-center">
-                <div className="text-center space-y-4 mb-8">
+                <AnimatedElement
+                    index={0}
+                    className="text-center space-y-4 mb-8"
+                    threshold={0.4}
+                >
                     <Badge variant="outline">FAQ</Badge>
                     <h2 className="text-3xl font-semibold tracking-tighter sm:text-4xl md:text-5xl">
                         Frequently Asked Questions
                     </h2>
-                </div>
+                </AnimatedElement>
 
                 <div className="w-full max-w-3xl">
                     <Accordion type="single" collapsible className="w-full">
                         {faqs.map((faq, index) => (
-                            <AccordionItem key={index} value={`item-${index}`}>
-                                <AccordionTrigger className="text-left">
-                                    {faq.question}
-                                </AccordionTrigger>
-                                <AccordionContent>
-                                    {faq.answer}
-                                </AccordionContent>
-                            </AccordionItem>
+                            <AnimatedElement
+                                key={index}
+                                index={index + 1}
+                                threshold={0.2}
+                            >
+                                <AccordionItem value={`item-${index}`}>
+                                    <AccordionTrigger className="text-left">
+                                        {faq.question}
+                                    </AccordionTrigger>
+                                    <AccordionContent>
+                                        {faq.answer}
+                                    </AccordionContent>
+                                </AccordionItem>
+                            </AnimatedElement>
                         ))}
                     </Accordion>
                 </div>

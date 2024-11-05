@@ -3,6 +3,9 @@ import { Section } from "@/components/ui/section";
 import { Music } from "lucide-react";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
+import { motion } from "framer-motion";
+import { fadeInFromBelow, getStaggeredFadeIn } from "@/lib/animations";
+import { AnimatedElement } from "@/components/ui/animated-element";
 
 function HeroSection() {
     return (
@@ -13,7 +16,10 @@ function HeroSection() {
             id="hero"
         >
             <div className="flex flex-col items-center text-center">
-                <div className="inline-flex items-center rounded-full border px-4 py-1.5 mb-8 bg-background">
+                <AnimatedElement
+                    index={0}
+                    className="inline-flex items-center rounded-full border px-4 py-1.5 mb-8 bg-background"
+                >
                     <span className="relative flex h-2 w-2 mr-2">
                         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
                         <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
@@ -21,18 +27,30 @@ function HeroSection() {
                     <span className="text-sm font-medium">
                         Version 1.0 is now live
                     </span>
-                </div>
+                </AnimatedElement>
 
-                <h1 className="text-4xl font-bold tracking-tight sm:text-6xl mb-4">
+                <AnimatedElement
+                    as="h1"
+                    index={1}
+                    className="text-4xl font-bold tracking-tight sm:text-6xl mb-4"
+                >
                     Curating Spotify Playlists with Precision
-                </h1>
-                <p className="text-xl text-muted-foreground mb-6">
+                </AnimatedElement>
+
+                <AnimatedElement
+                    as="p"
+                    index={2}
+                    className="text-xl text-muted-foreground mb-6"
+                >
                     Developed by Linards M., this app showcases advanced
                     filtering, responsive design, and seamless integration with
                     the Spotify API.
-                </p>
+                </AnimatedElement>
 
-                <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                <AnimatedElement
+                    index={3}
+                    className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4"
+                >
                     <Button size="lg" onClick={() => signIn("spotify")}>
                         <Music className="mr-2 h-5 w-5" />
                         Sign in with Spotify
@@ -41,16 +59,33 @@ function HeroSection() {
                         size="lg"
                         variant="ghost"
                         onClick={() => {
-                            document.getElementById("about")?.scrollIntoView({
-                                behavior: "smooth",
-                            });
+                            document
+                                .getElementById("features")
+                                ?.scrollIntoView({
+                                    behavior: "smooth",
+                                });
                         }}
                     >
                         Learn more
                     </Button>
-                </div>
+                </AnimatedElement>
 
-                <div className="relative w-[95vw] aspect-video max-w-[1440px] max-h-[700px] rounded-lg overflow-hidden shadow-xl mt-12">
+                <AnimatedElement
+                    index={4}
+                    className="relative w-[95vw] aspect-video max-w-[1440px] max-h-[700px] rounded-lg overflow-hidden shadow-xl mt-12"
+                    variants={{
+                        hidden: { y: -20, opacity: 0 },
+                        visible: {
+                            y: 0,
+                            opacity: 1,
+                            transition: {
+                                type: "spring",
+                                stiffness: 50,
+                                damping: 20,
+                            },
+                        },
+                    }}
+                >
                     <Image
                         src="/app-screenshot.webp"
                         alt="PurePlaylist App Screenshot"
@@ -60,7 +95,7 @@ function HeroSection() {
                         priority
                     />
                     <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-background to-transparent" />
-                </div>
+                </AnimatedElement>
             </div>
         </Section>
     );

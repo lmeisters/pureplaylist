@@ -33,7 +33,6 @@ function LandingHeader() {
     };
 
     const navLinks = [
-        { href: "#about", label: "About" },
         { href: "#features", label: "Features" },
         { href: "#how-it-works", label: "How It Works" },
         { href: "#faq", label: "FAQ" },
@@ -42,10 +41,15 @@ function LandingHeader() {
     return (
         <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-4xl mx-auto px-4">
             <motion.div
+                initial={{ opacity: 0 }}
                 animate={{
+                    opacity: 1,
                     height: isOpen ? "auto" : "52px",
                 }}
-                transition={{ duration: 0.2 }}
+                transition={{
+                    duration: 0.3,
+                    opacity: { duration: 0.5 },
+                }}
                 className="w-full bg-background border rounded-lg overflow-hidden"
             >
                 {/* Header Content */}

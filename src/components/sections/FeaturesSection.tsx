@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Section } from "@/components/ui/section";
 import Image from "next/image";
+import { AnimatedElement } from "@/components/ui/animated-element";
 
 interface Feature {
     title: string;
@@ -77,37 +78,44 @@ function FeaturesSection() {
             variant="gray"
             id="features"
         >
-            <div className="space-y-4 text-center">
+            <AnimatedElement
+                index={0}
+                className="space-y-4 text-center"
+                threshold={0.4}
+            >
                 <Badge variant="outline">FEATURES</Badge>
                 <h2 className="text-3xl font-semibold tracking-tighter sm:text-4xl md:text-5xl">
                     Key Features of PurePlaylist
                 </h2>
-            </div>
+            </AnimatedElement>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-12 [&>*:nth-child(3)]:md:col-span-2 [&>*:nth-child(6)]:md:col-span-2 lg:[&>*:nth-child(3)]:col-span-1 lg:[&>*:nth-child(6)]:col-span-1">
-                {features.map((feature) => (
-                    <Card
+                {features.map((feature, index) => (
+                    <AnimatedElement
                         key={feature.title}
-                        className="p-6 space-y-4 transition-all duration-300 hover:shadow-lg hover:bg-white hover:border-primary/20"
+                        index={index + 1}
+                        className="h-full"
                     >
-                        <h3 className="font-semibold text-xl">
-                            {feature.title}
-                        </h3>
-                        <p className="text-muted-foreground">
-                            {feature.description}
-                        </p>
-                        {feature.image && (
-                            <div className="relative w-full aspect-video mt-4 rounded-lg overflow-hidden bg-secondary/10">
-                                <Image
-                                    src={feature.image.src}
-                                    alt={feature.image.alt}
-                                    fill
-                                    className="object-contain"
-                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                />
-                            </div>
-                        )}
-                    </Card>
+                        <Card className="p-6 space-y-4 transition-all duration-300 hover:shadow-lg hover:bg-white hover:border-primary/20 h-full">
+                            <h3 className="font-semibold text-xl">
+                                {feature.title}
+                            </h3>
+                            <p className="text-muted-foreground">
+                                {feature.description}
+                            </p>
+                            {feature.image && (
+                                <div className="relative w-full aspect-video mt-4 rounded-lg overflow-hidden bg-secondary/10">
+                                    <Image
+                                        src={feature.image.src}
+                                        alt={feature.image.alt}
+                                        fill
+                                        className="object-contain"
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                    />
+                                </div>
+                            )}
+                        </Card>
+                    </AnimatedElement>
                 ))}
             </div>
         </Section>

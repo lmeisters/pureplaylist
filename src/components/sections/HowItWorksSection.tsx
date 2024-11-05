@@ -1,5 +1,7 @@
 import { Section } from "@/components/ui/section";
 import { Badge } from "@/components/ui/badge";
+import { AnimatedElement } from "@/components/ui/animated-element";
+import Image from "next/image";
 
 function HowItWorksSection() {
     const steps = [
@@ -28,19 +30,28 @@ function HowItWorksSection() {
     return (
         <Section containerWidth="wide" variant="gray" id="how-it-works">
             <div>
-                <div className="space-y-3 text-center">
+                <AnimatedElement
+                    index={0}
+                    className="space-y-3 text-center"
+                    threshold={0.4}
+                >
                     <Badge variant="outline">HOW IT WORKS</Badge>
                     <h2 className="text-3xl font-semibold tracking-tighter sm:text-4xl md:text-5xl">
                         Simple Steps to Organize Your Music
                     </h2>
-                </div>
+                </AnimatedElement>
 
                 <div className="mt-16 relative">
                     <div className="hidden md:block absolute left-1/2 -top-8 h-[calc(100%+6rem)] w-px bg-gradient-to-b from-transparent via-gray-400 to-transparent -translate-x-1/2" />
 
                     <div className="space-y-16">
                         {steps.map((step, index) => (
-                            <div key={step.title} className="relative">
+                            <AnimatedElement
+                                key={step.title}
+                                index={index + 1}
+                                className="relative"
+                                threshold={0.3}
+                            >
                                 <div className="absolute left-1/2 -top-16 h-16 w-px bg-gradient-to-b from-transparent via-gray-400 to-gray-400 -translate-x-1/2 md:hidden" />
 
                                 <div
@@ -80,15 +91,17 @@ function HowItWorksSection() {
                                                     : "bg-white"
                                             }`}
                                         >
-                                            <img
+                                            <Image
                                                 src={step.image}
                                                 alt={step.title}
+                                                width={1920}
+                                                height={1080}
                                                 className="w-full h-full object-contain"
                                             />
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </AnimatedElement>
                         ))}
                     </div>
                 </div>
