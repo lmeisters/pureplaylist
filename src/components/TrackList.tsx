@@ -632,7 +632,7 @@ const TrackList: React.FC<TrackListProps> = ({
                 onClearFilters={clearFilters}
                 initialFilters={filterCriteria}
             />
-            <div className="p-2 font-semibold border-b grid grid-cols-[2rem,2fr,1fr,auto,auto,auto,auto] md:grid-cols-[2rem,2fr,1fr,6rem,6rem,4rem,2rem] gap-2 md:gap-4 items-center text-xs md:text-sm">
+            <div className="p-2 font-semibold border-b grid grid-cols-[2rem,2fr,1fr,auto,auto,auto,2rem] md:grid-cols-[2rem,2fr,1fr,6rem,6rem,4rem,2rem] gap-2 md:gap-4 items-center text-xs md:text-sm">
                 <SortButton
                     field="number"
                     sortField={sortField}
@@ -681,9 +681,9 @@ const TrackList: React.FC<TrackListProps> = ({
                     sortOrder={sortOrder}
                     toggleSort={toggleSort}
                     icon="clock"
-                    className="flex justify-center"
+                    className="flex justify-center w-full"
                 />
-                <div className="flex items-center justify-center">
+                <div className="flex items-center justify-center w-full">
                     <Checkbox
                         id="multi-select-mode"
                         checked={isMultiSelectMode}

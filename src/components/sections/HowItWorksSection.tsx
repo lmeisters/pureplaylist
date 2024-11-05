@@ -5,7 +5,7 @@ function HowItWorksSection() {
     const steps = [
         {
             title: "Connect to Spotify",
-            description: "Easily link your Spotify account to get started.",
+            description: "Link your Spotify account to get started.",
             image: "/images/connect-spotify.webp",
         },
         {
@@ -73,11 +73,17 @@ function HowItWorksSection() {
                                             index % 2 === 1 ? "md:order-1" : ""
                                         }`}
                                     >
-                                        <div className="aspect-video w-full overflow-hidden rounded-md bg-muted">
+                                        <div
+                                            className={`aspect-video w-full overflow-hidden rounded-md border border-gray-200 ${
+                                                index === 0
+                                                    ? "bg-black"
+                                                    : "bg-white"
+                                            }`}
+                                        >
                                             <img
                                                 src={step.image}
                                                 alt={step.title}
-                                                className="w-full h-full object-cover"
+                                                className="w-full h-full object-contain"
                                             />
                                         </div>
                                     </div>

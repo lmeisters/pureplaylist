@@ -84,7 +84,7 @@ export const TrackListHeader: React.FC<TrackListHeaderProps> = ({
                     onClick={() => savePlaylist(false)}
                     disabled={isSaving}
                 >
-                    <Save className="w-4 h-4 mr-2" />
+                    <Save className="w-4 h-4" />
                     {isSaving ? "Saving..." : "Update"}
                 </Button>
             </div>

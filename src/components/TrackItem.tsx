@@ -74,7 +74,7 @@ export const TrackItem: React.FC<TrackItemProps> = ({
     return (
         <>
             <div
-                className={`grid grid-cols-[2rem,2fr,1fr,auto,auto,auto,auto] md:grid-cols-[2rem,2fr,1fr,6rem,6rem,4rem,2rem] gap-2 md:gap-4 items-center p-2 text-xs md:text-sm hover:bg-accent/50 relative ${
+                className={`grid grid-cols-[2rem,2fr,1fr,auto,auto,auto,2rem] md:grid-cols-[2rem,2fr,1fr,6rem,6rem,4rem,2rem] gap-2 md:gap-4 items-center p-2 text-xs md:text-sm hover:bg-accent/50 relative ${
                     isFiltered ? "bg-yellow-50" : ""
                 } ${isDeleted ? "opacity-50 line-through" : ""}`}
             >
@@ -122,10 +122,10 @@ export const TrackItem: React.FC<TrackItemProps> = ({
                         ? `${audioFeatures.tempo.toFixed(0)} BPM`
                         : "-"}
                 </div>
-                <div className="text-sm text-muted-foreground text-right">
+                <div className="text-sm text-muted-foreground flex justify-center w-full">
                     {formatDuration(item.track.duration_ms)}
                 </div>
-                <div className="flex items-center justify-center">
+                <div className="flex justify-center w-full">
                     {isMultiSelectMode ? (
                         <Checkbox
                             checked={selectedTracks.has(item.track.uri)}
@@ -138,8 +138,9 @@ export const TrackItem: React.FC<TrackItemProps> = ({
                             variant="ghost"
                             size="icon"
                             onClick={() => setShowDeleteConfirm(true)}
+                            className="h-8 w-8"
                         >
-                            <Trash2 className="h-4 w-4 text-muted-foreground" />
+                            <Trash2 className="h-4 w-4" />
                         </Button>
                     )}
                 </div>

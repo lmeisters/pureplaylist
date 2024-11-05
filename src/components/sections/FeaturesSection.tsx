@@ -88,7 +88,7 @@ function FeaturesSection() {
                 {features.map((feature) => (
                     <Card
                         key={feature.title}
-                        className="p-6 space-y-4 transition-all duration-300 hover:shadow-lg hover:bg-secondary/10 hover:border-primary/20"
+                        className="p-6 space-y-4 transition-all duration-300 hover:shadow-lg hover:bg-white hover:border-primary/20"
                     >
                         <h3 className="font-semibold text-xl">
                             {feature.title}
@@ -97,12 +97,12 @@ function FeaturesSection() {
                             {feature.description}
                         </p>
                         {feature.image && (
-                            <div className="relative w-full aspect-video mt-4 rounded-lg overflow-hidden">
+                            <div className="relative w-full aspect-video mt-4 rounded-lg overflow-hidden bg-secondary/10">
                                 <Image
                                     src={feature.image.src}
                                     alt={feature.image.alt}
                                     fill
-                                    className="object-cover"
+                                    className="object-contain"
                                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                 />
                             </div>
