@@ -23,8 +23,8 @@ export function Section({
         <section
             className={cn(
                 "relative flex flex-col items-center justify-center",
-                "px-4 sm:px-6 lg:px-8 2xl:px-0",
-                !noPaddingTop && "pt-20",
+                "px-8 lg:px-16",
+                !noPaddingTop && "pt-28 pb-28",
                 size === "default" ? "min-h-screen" : "min-h-[50vh]",
                 variant === "default" && "bg-background/50",
                 variant === "gray" && "bg-secondary/30",
