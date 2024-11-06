@@ -17,6 +17,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
+import { useDebouncedCallback } from "use-debounce";
 
 type SortOption = "default" | "nameAsc" | "nameDesc" | "sizeAsc" | "sizeDesc";
 
@@ -39,6 +40,16 @@ const PlaylistManager = () => {
     const queryClient = useQueryClient();
     const { toast } = useToast();
     const router = useRouter();
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
+
+    const debouncedSetSearch = useDebouncedCallback((value: string) => {
+        setDebouncedSearchTerm(value);
+    }, 300);
+
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(e.target.value);
+        debouncedSetSearch(e.target.value);
+    };
 
     useEffect(() => {
         const storedFavorites = localStorage.getItem("favoritePlaylistIds");
@@ -75,19 +86,26 @@ const PlaylistManager = () => {
     };
 
     const filteredAndSortedPlaylists = useMemo(() => {
-        const result =
-            playlists?.filter((playlist) =>
-                playlist.name.toLowerCase().includes(searchTerm.toLowerCase())
-            ) || [];
+        if (!playlists) return [];
 
-        result.sort((a, b) => {
+        // First filter playlists
+        const searchTerms = debouncedSearchTerm
+            .toLowerCase()
+            .trim()
+            .split(/\s+/);
+        const filtered = playlists.filter((playlist) => {
+            if (!debouncedSearchTerm.trim()) return true;
+
+            const playlistName = playlist.name.toLowerCase();
+            return searchTerms.every((term) => playlistName.includes(term));
+        });
+
+        // Then sort the filtered results
+        return [...filtered].sort((a, b) => {
             if (favorites.has(a.id) && !favorites.has(b.id)) return -1;
             if (!favorites.has(a.id) && favorites.has(b.id)) return 1;
 
             switch (sortOption) {
-                case "default":
-                    // Use a different property for default sorting if createdAt is not available
-                    return 0;
                 case "nameAsc":
                     return a.name.localeCompare(b.name);
                 case "nameDesc":
@@ -100,9 +118,7 @@ const PlaylistManager = () => {
                     return 0;
             }
         });
-
-        return result;
-    }, [playlists, searchTerm, sortOption, favorites]);
+    }, [playlists, debouncedSearchTerm, sortOption, favorites]);
 
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -151,7 +167,7 @@ const PlaylistManager = () => {
                             type="text"
                             placeholder="Search playlists..."
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onChange={handleSearchChange}
                             className="w-full pr-16"
                         />
                         <kbd className="hidden md:inline-flex absolute right-2 top-1/2 transform -translate-y-1/2 items-center rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
