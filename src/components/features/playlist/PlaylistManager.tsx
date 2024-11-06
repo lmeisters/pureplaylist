@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { usePlaylistsQuery } from "@/hooks/usePlaylistQuery";
 import TrackList from "@/components/features/tracks/TrackList";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Music, Filter, Star } from "lucide-react";
+import { Music, Filter, Star, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +18,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useDebouncedCallback } from "use-debounce";
+import { Progress } from "@/components/ui/progress";
+import { cn } from "@/lib/utils";
 
 type SortOption = "default" | "nameAsc" | "nameDesc" | "sizeAsc" | "sizeDesc";
 
@@ -29,7 +31,13 @@ interface Playlist {
 }
 
 const PlaylistManager = () => {
-    const { data: playlists, isLoading, error } = usePlaylistsQuery();
+    const {
+        data: playlists,
+        isLoading,
+        error,
+        loadingProgress,
+        isLoadingMore,
+    } = usePlaylistsQuery();
     const [selectedPlaylist, setSelectedPlaylist] = useState<string | null>(
         null
     );
@@ -143,8 +151,9 @@ const PlaylistManager = () => {
 
     if (isLoading)
         return (
-            <div className="h-full flex items-center justify-center">
-                Loading playlists...
+            <div className="h-full flex flex-col items-center justify-center space-y-2">
+                <Loader2 className="h-8 w-8 animate-spin" />
+                <p>Loading playlists...</p>
             </div>
         );
     if (error)
@@ -270,6 +279,33 @@ const PlaylistManager = () => {
                         )}
                     </div>
                 </ScrollArea>
+                {isLoadingMore && (
+                    <div
+                        className={cn(
+                            "fixed bottom-4 left-4",
+                            "bg-background/80 backdrop-blur-sm rounded-full p-2 shadow-md",
+                            "transition-opacity duration-300",
+                            "max-w-xs",
+                            loadingProgress === 100
+                                ? "opacity-0"
+                                : "opacity-100",
+                            "z-50"
+                        )}
+                    >
+                        <div className="flex items-center space-x-2">
+                            <span className="text-xs whitespace-nowrap">
+                                Loading all playlists
+                            </span>
+                            <Progress
+                                value={loadingProgress}
+                                className="w-24"
+                            />
+                            <span className="text-xs font-medium whitespace-nowrap">
+                                {loadingProgress?.toFixed(0)}%
+                            </span>
+                        </div>
+                    </div>
+                )}
             </div>
             <div className="flex-1 h-full overflow-hidden">
                 {selectedPlaylist && (

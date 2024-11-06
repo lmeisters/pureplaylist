@@ -12,6 +12,8 @@ export const usePlaylistsQuery = () => {
   const queryClient = useQueryClient();
   const [allPlaylists, setAllPlaylists] = useState<SpotifyPlaylist[]>([]);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const query = useInfiniteQuery({
     queryKey: ['playlists'],
@@ -70,7 +72,11 @@ export const usePlaylistsQuery = () => {
       );
       setAllPlaylists(uniquePlaylists);
       
-      // After first successful load, set initialLoad to false
+      const totalPlaylists = query.data.pages[0].total;
+      const loadedPlaylists = uniquePlaylists.length;
+      const progress = totalPlaylists > 0 ? (loadedPlaylists / totalPlaylists) * 100 : 0;
+      setLoadingProgress(Math.min(progress, 100));
+
       if (isInitialLoad) {
         setIsInitialLoad(false);
       }
@@ -84,7 +90,9 @@ export const usePlaylistsQuery = () => {
   useEffect(() => {
     const loadNextPage = async () => {
       if (query.hasNextPage && !query.isFetchingNextPage) {
+        setIsLoadingMore(true);
         await query.fetchNextPage();
+        setIsLoadingMore(false);
       }
     };
     loadNextPage();
@@ -94,5 +102,7 @@ export const usePlaylistsQuery = () => {
     ...query,
     data: allPlaylists,
     isLoading: isInitialLoad && (query.isLoading || query.isFetchingNextPage),
+    loadingProgress,
+    isLoadingMore,
   };
 };
