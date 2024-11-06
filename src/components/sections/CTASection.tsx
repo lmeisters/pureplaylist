@@ -10,8 +10,16 @@ function CTASection() {
             <div className="relative">
                 <AnimatedElement
                     index={0}
-                    className="relative flex flex-col items-start text-left space-y-4 rounded-2xl py-16 px-12 bg-white shadow-[0_4px_24px_-4px_rgba(0,0,0,0.1)] isolate"
+                    className="relative flex flex-col items-start text-left space-y-4 rounded-2xl py-16 px-12 bg-white shadow-[0_4px_24px_-4px_rgba(0,0,0,0.1)] isolate overflow-hidden"
                 >
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 -translate-x-16 w-64 h-64 opacity-5 transform rotate-12">
+                        <img
+                            src="/icon.png"
+                            alt=""
+                            className="w-full h-full object-contain"
+                        />
+                    </div>
+
                     <AnimatedElement
                         as="h2"
                         index={1}
