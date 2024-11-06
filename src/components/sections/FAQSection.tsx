@@ -20,7 +20,11 @@ function FAQSection() {
         },
         {
             question: "What types of filters are available?",
-            answer: "You can filter tracks by keywords (in title or album), artists, genres, and more. Multiple filters can be combined for precise results.",
+            answer: "You can filter tracks by keywords (in title or album), artists, and more coming soon. Multiple filters can be combined for precise results.",
+        },
+        {
+            question: "Do you store my Spotify playlists?",
+            answer: "No, we don't store any personal data or playlists. PurePlaylist interacts directly with the Spotify API, and all data stays securely within your Spotify account.",
         },
         {
             question: "Is my Spotify data secure?",
@@ -36,7 +40,9 @@ function FAQSection() {
                     className="text-center space-y-4 mb-8"
                     threshold={0.4}
                 >
-                    <Badge variant="outline">FAQ</Badge>
+                    <Badge variant="outline" className="bg-white">
+                        FAQ
+                    </Badge>
                     <h2 className="text-3xl font-semibold tracking-tighter sm:text-4xl md:text-5xl">
                         Frequently Asked Questions
                     </h2>

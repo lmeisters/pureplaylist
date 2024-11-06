@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 interface SectionProps extends React.HTMLAttributes<HTMLElement> {
     children: React.ReactNode;
     containerWidth?: "default" | "wide" | "full";
-    variant?: "default" | "gray" | "dark" | "footer";
+    variant?: "default" | "gray" | "dark" | "footer" | "hero";
     size?: "default" | "half";
     noPaddingTop?: boolean;
     allowOverflow?: boolean;
@@ -47,8 +47,9 @@ export function Section({
                 sizeConfig.height,
                 "max-h-none",
                 variant === "default" && "bg-background/50",
-                variant === "gray" && "bg-secondary/30",
+                variant === "gray" && "bg-[#F5F5F5]",
                 variant === "dark" && "bg-black text-white",
+                variant === "hero" && "bg-[#FAFAFA]",
                 variant === "footer" &&
                     "min-h-[200px] sm:min-h-[250px] lg:min-h-[300px] max-h-none bg-black text-white py-8 sm:py-12",
                 allowOverflow && "overflow-visible",

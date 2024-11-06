@@ -35,7 +35,9 @@ function HowItWorksSection() {
                     className="space-y-3 text-center"
                     threshold={0.4}
                 >
-                    <Badge variant="outline">HOW IT WORKS</Badge>
+                    <Badge variant="outline" className="bg-white">
+                        HOW IT WORKS
+                    </Badge>
                     <h2 className="text-3xl font-semibold tracking-tighter sm:text-4xl md:text-5xl">
                         Simple Steps to Organize Your Music
                     </h2>

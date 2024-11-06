@@ -83,7 +83,9 @@ function FeaturesSection() {
                 className="space-y-4 text-center"
                 threshold={0.4}
             >
-                <Badge variant="outline">FEATURES</Badge>
+                <Badge variant="outline" className="bg-white">
+                    FEATURES
+                </Badge>
                 <h2 className="text-3xl font-semibold tracking-tighter sm:text-4xl md:text-5xl">
                     Key Features of PurePlaylist
                 </h2>

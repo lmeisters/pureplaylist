@@ -25,16 +25,16 @@ function CTASection() {
                         index={1}
                         className="text-2xl font-semibold tracking-tighter sm:text-3xl md:text-4xl"
                     >
-                        Ready to Organize Your Spotify Playlists?
+                        See PurePlaylist in Action
                     </AnimatedElement>
 
                     <AnimatedElement
                         as="p"
                         index={2}
-                        className="text-lg text-muted-foreground max-w-[36rem]"
+                        className="text-lg text-muted-foreground max-w-[25rem]"
                     >
-                        Join thousands of users who are already enjoying
-                        cleaner, more organized music collections.
+                        Effortlessly organize your playlists with powerful
+                        filtering tools for a clean, tailored music experience.
                     </AnimatedElement>
 
                     <AnimatedElement

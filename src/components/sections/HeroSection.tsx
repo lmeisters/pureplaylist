@@ -8,7 +8,7 @@ import { AnimatedElement } from "@/components/ui/animated-element";
 function HeroSection() {
     return (
         <Section
-            variant="default"
+            variant="hero"
             allowOverflow
             className="pt-32 sm:pt-36"
             id="hero"
@@ -22,7 +22,7 @@ function HeroSection() {
                         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
                         <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
                     </span>
-                    <span className="text-sm font-medium">
+                    <span className="text-sm font-medium bg-white">
                         Version 1.0 is now live
                     </span>
                 </AnimatedElement>
@@ -40,9 +40,8 @@ function HeroSection() {
                     index={2}
                     className="text-xl text-muted-foreground mb-6"
                 >
-                    Developed by Linards M., this app showcases advanced
-                    filtering, responsive design, and seamless integration with
-                    the Spotify API.
+                    Filter your Spotify playlists with ease. Simplify your music
+                    experience, stay focused on what you love.
                 </AnimatedElement>
 
                 <AnimatedElement
