@@ -27,3 +27,7 @@ PurePlaylist is a web application that helps users organize and manage their Spo
 4. Use the sort and filter options to organize tracks
 5. Create new playlists or modify existing ones
 6. Enjoy your perfectly organized music library!
+
+## Screenshot
+
+![PurePlaylist in Action](./public/app-screenshot.webp)
