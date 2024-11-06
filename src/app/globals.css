@@ -78,6 +78,31 @@
         --sidebar-border: 240 3.7% 15.9%;
         --sidebar-ring: 217.2 91.2% 59.8%;
     }
+
+    /* Custom scrollbar styles for the landing page */
+    .landing-scrollbar {
+        scrollbar-width: thin;
+        scrollbar-color: hsl(var(--secondary-foreground/0.7)) transparent;
+    }
+
+    .landing-scrollbar::-webkit-scrollbar {
+        width: 12px;
+    }
+
+    .landing-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .landing-scrollbar::-webkit-scrollbar-thumb {
+        background-color: hsl(var(--secondary-foreground/0.7));
+        border-radius: 9999px;
+        border: 2px solid transparent;
+        background-clip: padding-box;
+    }
+
+    .landing-scrollbar::-webkit-scrollbar-thumb:hover {
+        background-color: hsl(var(--secondary-foreground/0.5));
+    }
 }
 
 @layer base {

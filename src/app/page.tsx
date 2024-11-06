@@ -8,6 +8,7 @@ import HowItWorksSection from "@/components/sections/HowItWorksSection";
 import FAQSection from "@/components/sections/FAQSection";
 import CTASection from "@/components/sections/CTASection";
 import FooterSection from "@/components/sections/FooterSection";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 function HomeContent() {
     const { data: session } = useSession();
@@ -22,14 +23,14 @@ function HomeContent() {
 
     return (
         <div className="h-screen overflow-hidden">
-            <div className="h-full overflow-auto">
+            <ScrollArea className="h-full landing-scrollbar">
                 <HeroSection />
                 <FeaturesSection />
                 <HowItWorksSection />
                 <FAQSection />
                 <CTASection />
                 <FooterSection />
-            </div>
+            </ScrollArea>
         </div>
     );
 }
