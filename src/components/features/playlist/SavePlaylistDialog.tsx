@@ -27,7 +27,7 @@ export const SavePlaylistDialog: React.FC<SavePlaylistDialogProps> = ({
 }) => {
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogContent>
+            <DialogContent className="sm:max-w-[425px] max-w-[95%] mx-auto rounded-lg">
                 <DialogHeader>
                     <DialogTitle>Create New Playlist</DialogTitle>
                     <DialogDescription>

@@ -76,7 +76,7 @@ export function FilterTab({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent>
+            <DialogContent className="sm:max-w-[425px] max-w-[95%] mx-auto rounded-lg">
                 <DialogHeader>
                     <DialogTitle>Filter Tracks</DialogTitle>
                     <DialogDescription>
@@ -135,7 +135,7 @@ export function FilterTab({
                         />
                     </div>
                 </div>
-                <DialogFooter>
+                <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
                     <Button variant="outline" onClick={handleClearFilters}>
                         Clear Filters
                     </Button>
