@@ -1,7 +1,7 @@
 "use client";
 
-import AppHeader from "@/components/AppHeader";
-import LandingHeader from "@/components/LandingHeader";
+import AppHeader from "@/components/layout/AppHeader";
+import LandingHeader from "@/components/layout/LandingHeader";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Providers } from "@/components/Providers";
 import { Toaster } from "@/components/ui/toaster";

@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import PlaylistManager from "@/components/PlaylistManager";
+import PlaylistManager from "@/components/features/playlist/PlaylistManager";
 import HeroSection from "@/components/sections/HeroSection";
 import FeaturesSection from "@/components/sections/FeaturesSection";
 import HowItWorksSection from "@/components/sections/HowItWorksSection";

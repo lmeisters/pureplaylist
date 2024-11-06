@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import { usePlaylistsQuery } from "@/hooks/usePlaylistQuery";
-import TrackList from "@/components/TrackList";
+import TrackList from "@/components/features/tracks/TrackList";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Music, Filter, Star } from "lucide-react";
 import { Input } from "@/components/ui/input";

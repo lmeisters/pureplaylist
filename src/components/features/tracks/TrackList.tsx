@@ -8,7 +8,7 @@ import { useSession } from "next-auth/react";
 import { useToast } from "@/hooks/use-toast";
 import { TrackListHeader } from "./TrackListHeader";
 import { TrackItem } from "./TrackItem";
-import { SavePlaylistDialog } from "./SavePlaylistDialog";
+import { SavePlaylistDialog } from "../playlist/SavePlaylistDialog";
 import { SortButton } from "./SortButton";
 import { useQueryClient } from "@tanstack/react-query";
 import { FilterTab, FilterCriteria } from "./FilterTab";

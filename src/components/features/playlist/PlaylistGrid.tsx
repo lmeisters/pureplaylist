@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { usePlaylistsQuery } from "@/hooks/usePlaylistQuery";
-import TrackList from "@/components/TrackList";
+import TrackList from "@/components/features/tracks/TrackList";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 

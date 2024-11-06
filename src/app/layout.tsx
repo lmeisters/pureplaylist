@@ -1,5 +1,5 @@
 import "./globals.css";
-import { RootLayoutClient } from "@/components/RootLayoutClient";
+import { RootLayoutClient } from "@/components/layout/RootLayoutClient";
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import { Inter } from "next/font/google";
