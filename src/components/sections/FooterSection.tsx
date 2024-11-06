@@ -1,7 +1,7 @@
 import { Section } from "@/components/ui/section";
 import { Github } from "lucide-react";
 import Link from "next/link";
-
+import Image from "next/image";
 function FooterSection() {
     function scrollToSection(sectionId: string) {
         const element = document.getElementById(sectionId);
@@ -21,9 +21,18 @@ function FooterSection() {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 pb-2 sm:pb-4">
                 {/* About Section */}
                 <div className="col-span-1 sm:col-span-2">
-                    <h3 className="font-semibold text-lg sm:text-xl mb-2">
-                        PurePlaylist
-                    </h3>
+                    <div className="flex items-center gap-2 mb-2">
+                        <Image
+                            src="/icon.png"
+                            alt="PurePlaylist"
+                            width={24}
+                            height={24}
+                            className="invert dark:invert-0"
+                        />
+                        <h3 className="font-semibold text-lg sm:text-xl">
+                            PurePlaylist
+                        </h3>
+                    </div>
                     <p className="text-sm text-muted-foreground mb-4 max-w-md">
                         Empowering music lovers to create and share perfectly
                         curated playlists. Our mission is to make playlist

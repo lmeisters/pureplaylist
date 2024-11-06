@@ -96,13 +96,15 @@ function FeaturesSection() {
                         index={index + 1}
                         className="h-full"
                     >
-                        <Card className="p-6 space-y-4 transition-all duration-300 hover:shadow-lg hover:bg-white hover:border-primary/20 h-full">
-                            <h3 className="font-semibold text-xl">
-                                {feature.title}
-                            </h3>
-                            <p className="text-muted-foreground">
-                                {feature.description}
-                            </p>
+                        <Card className="flex flex-col p-6 h-full transition-all hover:shadow-lg hover:bg-background">
+                            <div className="flex-1 space-y-4">
+                                <h3 className="font-semibold text-xl">
+                                    {feature.title}
+                                </h3>
+                                <p className="text-muted-foreground">
+                                    {feature.description}
+                                </p>
+                            </div>
                             {feature.image && (
                                 <div className="relative w-full aspect-video mt-4 rounded-lg overflow-hidden bg-secondary/10">
                                     <Image
