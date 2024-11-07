@@ -143,11 +143,13 @@ const TrackList: React.FC<TrackListProps> = ({
 
         setIsSaving(true);
         try {
+            // Fetch all pages of tracks before saving
+            while (hasNextPage) {
+                await fetchNextPage();
+            }
+
             // Refetch playlist details before saving
             await refetch();
-
-            console.log("Current Playlist Details:", currentPlaylistDetails);
-            console.log("Full session object:", session);
 
             if (!currentPlaylistDetails) {
                 throw new Error(
@@ -155,7 +157,11 @@ const TrackList: React.FC<TrackListProps> = ({
                 );
             }
 
-            // For new playlist creation
+            // Get track URIs excluding deleted tracks
+            const trackUris = sortedAndFilteredTracks
+                .filter((item) => !deletedTracks.has(item.track.uri))
+                .map((item) => item.track.uri);
+
             if (createNew) {
                 if (!newPlaylistName) {
                     toast({
@@ -167,11 +173,6 @@ const TrackList: React.FC<TrackListProps> = ({
                     setIsSaving(false);
                     return;
                 }
-
-                // Get track URIs excluding deleted tracks
-                const trackUris = sortedAndFilteredTracks
-                    .filter((item) => !deletedTracks.has(item.track.uri))
-                    .map((item) => item.track.uri);
 
                 console.log("Creating new playlist...");
                 const response = await fetch(
@@ -237,69 +238,36 @@ const TrackList: React.FC<TrackListProps> = ({
                 setIsDialogOpen(false);
                 setNewPlaylistName("");
             } else {
-                // Update existing playlist
-                const trackUris = sortedAndFilteredTracks
-                    .filter((item) => !deletedTracks.has(item.track.uri))
-                    .map((item) => item.track.uri);
-
-                try {
-                    await spotifyApi.put(
-                        `/playlists/${playlistId}/tracks`,
+                // Spotify API allows a maximum of 100 URIs per request
+                const chunkSize = 100;
+                for (let i = 0; i < trackUris.length; i += chunkSize) {
+                    const chunk = trackUris.slice(i, i + chunkSize);
+                    const response = await fetch(
+                        `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
                         {
-                            uris: trackUris,
-                        },
-                        {
+                            method: "PUT",
                             headers: {
                                 Authorization: `Bearer ${session.accessToken}`,
+                                "Content-Type": "application/json",
                             },
+                            body: JSON.stringify({ uris: chunk }),
                         }
                     );
 
-                    // Update the local query cache
-                    queryClient.setQueryData(
-                        ["playlistTracks", playlistId],
-                        (oldData: unknown) => {
-                            if (oldData && typeof oldData === "object") {
-                                return {
-                                    ...oldData,
-                                    pages: [
-                                        {
-                                            items: sortedAndFilteredTracks.filter(
-                                                (item) =>
-                                                    !deletedTracks.has(
-                                                        item.track.uri
-                                                    )
-                                            ),
-                                        },
-                                    ],
-                                };
-                            }
-                            return oldData;
-                        }
-                    );
-
-                    toast({
-                        title: "Success",
-                        description:
-                            "Playlist updated with the new track order and deletions.",
-                    });
-                } catch (error: unknown) {
-                    console.error("Spotify API Error:", error);
-                    if (
-                        error instanceof Error &&
-                        "response" in error &&
-                        typeof error.response === "object" &&
-                        error.response &&
-                        "status" in error.response &&
-                        error.response.status === 403
-                    ) {
+                    if (!response.ok) {
+                        const errorData = await response.json();
                         throw new Error(
-                            "You don't have permission to modify this playlist. Please check your Spotify account permissions."
+                            errorData.error?.message ||
+                                "Failed to update playlist tracks"
                         );
-                    } else {
-                        throw error;
                     }
                 }
+
+                toast({
+                    title: "Success",
+                    description:
+                        "Playlist updated with the new track order and deletions.",
+                });
             }
 
             setDeletedTracks(new Set());
