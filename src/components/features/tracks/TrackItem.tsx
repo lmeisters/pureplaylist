@@ -98,6 +98,7 @@ export const TrackItem: React.FC<TrackItemProps> = ({
                                 imageLoaded ? "opacity-100" : "opacity-0"
                             }`}
                             onLoad={() => setImageLoaded(true)}
+                            unoptimized
                         />
                     </div>
                     <div className="flex flex-col min-w-0">

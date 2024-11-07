@@ -49,6 +49,7 @@ const PlaylistGrid = () => {
                                     height={300}
                                     className="w-full h-full object-cover"
                                     priority={index === 0} // Add priority to the first image
+                                    unoptimized
                                 />
                             </div>
                             <h3
