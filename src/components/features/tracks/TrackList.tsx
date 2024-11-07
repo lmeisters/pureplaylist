@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { usePlaylistTracksQuery } from "@/hooks/usePlaylistTracksQuery";
 import { useInView } from "react-intersection-observer";
-import { spotifyApi } from "@/lib/spotify";
 import { useSession } from "next-auth/react";
 import { useToast } from "@/hooks/use-toast";
 import { TrackListHeader } from "./TrackListHeader";
