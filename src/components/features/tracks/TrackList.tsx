@@ -599,7 +599,7 @@ const TrackList: React.FC<TrackListProps> = ({
                 onClearFilters={clearFilters}
                 initialFilters={filterCriteria}
             />
-            <div className="p-2 font-semibold border-b grid grid-cols-[2rem,2fr,1fr,auto,auto,auto,2rem] md:grid-cols-[2rem,2fr,1fr,6rem,6rem,4rem,2rem] gap-2 md:gap-4 items-center text-xs md:text-sm">
+            <div className="p-2 font-semibold border-b grid grid-cols-[2rem,2fr,1fr,auto,auto,auto,2rem,var(--scrollbar-width)] md:grid-cols-[2rem,2fr,1fr,6rem,6rem,4rem,2rem,var(--scrollbar-width)] gap-2 md:gap-4 items-center text-xs md:text-sm">
                 <SortButton
                     field="number"
                     sortField={sortField}
@@ -667,7 +667,7 @@ const TrackList: React.FC<TrackListProps> = ({
                             height={height}
                             itemCount={sortedAndFilteredTracks.length}
                             itemSize={50}
-                            width={width}
+                            width={width + 12}
                             onItemsRendered={({
                                 visibleStartIndex,
                                 visibleStopIndex,

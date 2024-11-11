@@ -74,7 +74,7 @@ export const TrackItem: React.FC<TrackItemProps> = ({
     return (
         <>
             <div
-                className={`grid grid-cols-[2rem,2fr,1fr,auto,auto,auto,2rem] md:grid-cols-[2rem,2fr,1fr,6rem,6rem,4rem,2rem] gap-2 md:gap-4 items-center p-2 text-xs md:text-sm hover:bg-accent/50 relative ${
+                className={`grid grid-cols-[2rem,2fr,1fr,auto,auto,auto,2rem,var(--scrollbar-width)] md:grid-cols-[2rem,2fr,1fr,6rem,6rem,4rem,2rem,var(--scrollbar-width)] gap-2 md:gap-4 items-center p-2 text-xs md:text-sm hover:bg-accent/50 relative ${
                     isFiltered ? "bg-yellow-50" : ""
                 } ${isDeleted ? "opacity-50 line-through" : ""}`}
             >

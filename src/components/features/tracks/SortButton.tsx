@@ -6,7 +6,7 @@ import {
     Activity,
     Clock,
 } from "lucide-react";
-import { SortField, SortOrder } from "./TrackList"; // Adjust the import path as needed
+import { SortField, SortOrder } from "./TrackList";
 
 interface SortButtonProps {
     field: SortField;

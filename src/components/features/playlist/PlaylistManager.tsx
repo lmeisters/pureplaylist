@@ -219,7 +219,7 @@ const PlaylistManager = () => {
                     </DropdownMenu>
                 </div>
                 <ScrollArea className="flex-grow">
-                    <div className="pr-3 pl-2 py-2 space-y-2 pb-16">
+                    <div className="pr-3 pl-2 pt-2 space-y-2">
                         {filteredAndSortedPlaylists?.map(
                             (playlist: Playlist) => (
                                 <div
@@ -278,6 +278,7 @@ const PlaylistManager = () => {
                             )
                         )}
                     </div>
+                    <div className="h-16" />
                 </ScrollArea>
                 {isLoadingMore && (
                     <div
