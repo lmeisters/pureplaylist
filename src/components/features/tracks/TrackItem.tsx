@@ -74,11 +74,11 @@ export const TrackItem: React.FC<TrackItemProps> = ({
     return (
         <>
             <div
-                className={`grid grid-cols-[2rem,2fr,1fr,auto,auto,auto,2rem,var(--scrollbar-width)] md:grid-cols-[2rem,2fr,1fr,6rem,6rem,4rem,2rem,var(--scrollbar-width)] gap-2 md:gap-4 items-center p-2 text-xs md:text-sm hover:bg-accent/50 relative ${
+                className={`grid grid-cols-[3rem,2fr,1fr,auto,auto,auto,2rem,var(--scrollbar-width)] md:grid-cols-[3rem,2fr,1fr,6rem,6rem,4rem,2rem,var(--scrollbar-width)] gap-2 md:gap-4 items-center p-2 text-xs md:text-sm hover:bg-accent/50 relative ${
                     isFiltered ? "bg-yellow-50" : ""
                 } ${isDeleted ? "opacity-50 line-through" : ""}`}
             >
-                <div className="text-sm text-muted-foreground pl-2">
+                <div className="text-sm text-muted-foreground flex justify-center">
                     {originalIndex}
                 </div>
                 <div className="flex items-center space-x-2 min-w-0">
@@ -115,10 +115,10 @@ export const TrackItem: React.FC<TrackItemProps> = ({
                 <div className="truncate hidden md:block">
                     {item.track.album.name}
                 </div>
-                <div className="text-sm text-muted-foreground hidden md:block text-right">
+                <div className="text-sm text-muted-foreground hidden md:flex justify-center">
                     {formatDate(item.track.album.release_date)}
                 </div>
-                <div className="text-sm text-muted-foreground hidden md:block text-right">
+                <div className="text-sm text-muted-foreground hidden md:flex justify-center">
                     {audioFeatures?.tempo
                         ? `${audioFeatures.tempo.toFixed(0)} BPM`
                         : "-"}

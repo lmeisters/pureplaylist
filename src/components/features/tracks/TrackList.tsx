@@ -599,13 +599,13 @@ const TrackList: React.FC<TrackListProps> = ({
                 onClearFilters={clearFilters}
                 initialFilters={filterCriteria}
             />
-            <div className="p-2 font-semibold border-b grid grid-cols-[2rem,2fr,1fr,auto,auto,auto,2rem,var(--scrollbar-width)] md:grid-cols-[2rem,2fr,1fr,6rem,6rem,4rem,2rem,var(--scrollbar-width)] gap-2 md:gap-4 items-center text-xs md:text-sm">
+            <div className="p-2 font-semibold border-b grid grid-cols-[3rem,2fr,1fr,auto,auto,auto,2rem,var(--scrollbar-width)] md:grid-cols-[3rem,2fr,1fr,6rem,6rem,4rem,2rem,var(--scrollbar-width)] gap-2 md:gap-4 items-center text-xs md:text-sm">
                 <SortButton
                     field="number"
                     sortField={sortField}
                     sortOrder={sortOrder}
                     toggleSort={toggleSort}
-                    className="justify-start pl-2"
+                    className="justify-center pl-2"
                 >
                     #
                 </SortButton>
