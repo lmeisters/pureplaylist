@@ -497,7 +497,7 @@ const TrackList: React.FC<TrackListProps> = ({
 
     const toggleMultiSelectMode = () => {
         setIsMultiSelectMode(!isMultiSelectMode);
-        setSelectedTracks(new Set()); // Clear selections when toggling mode
+        setSelectedTracks(new Set());
     };
 
     const fetchAudioFeaturesForVisibleTracks = (
@@ -697,7 +697,7 @@ const TrackList: React.FC<TrackListProps> = ({
                         "fixed bottom-4 left-1/2 transform -translate-x-1/2",
                         "bg-background/80 backdrop-blur-sm rounded-full p-2 shadow-md",
                         "transition-opacity duration-300",
-                        "w-11/12 max-w-md", // Adjust width here
+                        "w-11/12 max-w-md",
                         loadingProgress === 100 ? "opacity-0" : "opacity-100"
                     )}
                 >

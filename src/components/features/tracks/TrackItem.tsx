@@ -15,6 +15,7 @@ import {
 import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AudioFeatures } from "@/types/spotify";
+import { useToast } from "@/hooks/use-toast";
 
 interface TrackItemProps {
     item: {
@@ -53,6 +54,8 @@ export const TrackItem: React.FC<TrackItemProps> = ({
     isDeleted,
     audioFeatures,
 }) => {
+    const { toast } = useToast();
+
     const formatDate = (dateString: string): string => {
         return new Date(dateString).toLocaleDateString();
     };
@@ -69,6 +72,12 @@ export const TrackItem: React.FC<TrackItemProps> = ({
     const handleDelete = () => {
         deleteTrack(item.track.uri);
         setShowDeleteConfirm(false);
+
+        toast({
+            title: "Track Removed",
+            description: `"${item.track.name}" has been removed from the playlist.`,
+            duration: 3000,
+        });
     };
 
     return (
