@@ -74,7 +74,7 @@ export const TrackItem: React.FC<TrackItemProps> = ({
     return (
         <>
             <div
-                className={`grid grid-cols-[3rem,2fr,1fr,auto,auto,auto,2rem,var(--scrollbar-width)] md:grid-cols-[3rem,2fr,1fr,6rem,6rem,4rem,2rem,var(--scrollbar-width)] gap-2 md:gap-4 items-center p-2 text-xs md:text-sm hover:bg-accent/50 relative ${
+                className={`grid grid-cols-[3rem,1fr,auto,2rem] md:grid-cols-[3rem,2fr,1fr,6rem,6rem,4rem,2rem,var(--scrollbar-width)] gap-2 md:gap-4 items-center p-2 text-xs md:text-sm hover:bg-accent/50 relative ${
                     isFiltered ? "bg-yellow-50" : ""
                 } ${isDeleted ? "opacity-50 line-through" : ""}`}
             >
@@ -101,11 +101,11 @@ export const TrackItem: React.FC<TrackItemProps> = ({
                             unoptimized
                         />
                     </div>
-                    <div className="flex flex-col min-w-0">
-                        <span className="font-semibold truncate max-w-[8rem] sm:max-w-[12rem] md:max-w-full">
+                    <div className="flex flex-col min-w-0 flex-1">
+                        <span className="font-semibold truncate">
                             {item.track.name}
                         </span>
-                        <span className="text-muted-foreground truncate max-w-[8rem] sm:max-w-[12rem] md:max-w-full">
+                        <span className="text-muted-foreground truncate">
                             {item.track.artists
                                 .map((artist: { name: string }) => artist.name)
                                 .join(", ")}
