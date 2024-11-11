@@ -219,7 +219,7 @@ const PlaylistManager = () => {
                     </DropdownMenu>
                 </div>
                 <ScrollArea className="flex-grow">
-                    <div className="p-2 space-y-2 pb-16">
+                    <div className="pr-3 pl-2 py-2 space-y-2 pb-16">
                         {filteredAndSortedPlaylists?.map(
                             (playlist: Playlist) => (
                                 <div
