@@ -169,7 +169,7 @@ const PlaylistManager = () => {
     return (
         <div className="flex flex-col md:flex-row h-full">
             <div className="w-full md:w-80 h-64 md:h-full overflow-hidden border-b md:border-r flex flex-col">
-                <div className="p-2 relative flex items-center space-x-2">
+                <div className="pr-3 pl-2 pt-2 relative flex items-center space-x-2">
                     <div className="flex-grow relative flex items-center">
                         <Input
                             ref={searchInputRef}
@@ -177,7 +177,7 @@ const PlaylistManager = () => {
                             placeholder="Search playlists..."
                             value={searchTerm}
                             onChange={handleSearchChange}
-                            className="w-full pr-16"
+                            className="w-full pr-12"
                         />
                         <kbd className="hidden md:inline-flex absolute right-2 top-1/2 transform -translate-y-1/2 items-center rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
                             <span className="text-xs">Ctrl+K</span>

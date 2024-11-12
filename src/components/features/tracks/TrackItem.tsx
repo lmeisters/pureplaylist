@@ -16,6 +16,7 @@ import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AudioFeatures } from "@/types/spotify";
 import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
 interface TrackItemProps {
     item: {
@@ -41,6 +42,7 @@ interface TrackItemProps {
     isFiltered: boolean;
     isDeleted: boolean;
     audioFeatures: AudioFeatures | null;
+    isLoadingBPM?: boolean;
 }
 
 export const TrackItem: React.FC<TrackItemProps> = ({
@@ -53,6 +55,7 @@ export const TrackItem: React.FC<TrackItemProps> = ({
     isFiltered,
     isDeleted,
     audioFeatures,
+    isLoadingBPM = false,
 }) => {
     const { toast } = useToast();
 
@@ -128,9 +131,13 @@ export const TrackItem: React.FC<TrackItemProps> = ({
                     {formatDate(item.track.album.release_date)}
                 </div>
                 <div className="text-sm text-muted-foreground hidden md:flex justify-center">
-                    {audioFeatures?.tempo
-                        ? `${audioFeatures.tempo.toFixed(0)} BPM`
-                        : "-"}
+                    {isLoadingBPM ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : audioFeatures?.tempo ? (
+                        `${audioFeatures.tempo.toFixed(0)} BPM`
+                    ) : (
+                        "-"
+                    )}
                 </div>
                 <div className="text-sm text-muted-foreground flex justify-center w-full">
                     {formatDuration(item.track.duration_ms)}

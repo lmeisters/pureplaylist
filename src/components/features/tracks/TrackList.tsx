@@ -109,6 +109,8 @@ const TrackList: React.FC<TrackListProps> = ({
     // New state to keep track of deleted tracks
     const [deletedTracks, setDeletedTracks] = useState<Set<string>>(new Set());
 
+    const [loadingBPMs, setLoadingBPMs] = useState<Set<string>>(new Set());
+
     useEffect(() => {
         if (inView && hasNextPage) {
             fetchNextPage();
@@ -500,7 +502,7 @@ const TrackList: React.FC<TrackListProps> = ({
         setSelectedTracks(new Set());
     };
 
-    const fetchAudioFeaturesForVisibleTracks = (
+    const fetchAudioFeaturesForVisibleTracks = async (
         startIndex: number,
         stopIndex: number
     ) => {
@@ -511,11 +513,19 @@ const TrackList: React.FC<TrackListProps> = ({
         const tracksWithoutAudioFeatures = visibleTracks.filter(
             (track) => !audioFeatures[track.track.id]
         );
+
         if (tracksWithoutAudioFeatures.length > 0) {
             const trackIds = tracksWithoutAudioFeatures.map(
                 (track) => track.track.id
             );
-            fetchAudioFeatures(trackIds);
+
+            // Set loading state for these tracks
+            setLoadingBPMs(new Set(trackIds));
+
+            await fetchAudioFeatures(trackIds);
+
+            // Clear loading state
+            setLoadingBPMs(new Set());
         }
     };
 
@@ -553,6 +563,7 @@ const TrackList: React.FC<TrackListProps> = ({
                     audioFeatures={
                         audioFeatures[item.track.id] as AudioFeatures
                     }
+                    isLoadingBPM={loadingBPMs.has(item.track.id)}
                 />
             </div>
         );
