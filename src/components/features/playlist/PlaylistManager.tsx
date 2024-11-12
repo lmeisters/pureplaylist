@@ -168,7 +168,7 @@ const PlaylistManager = () => {
 
     return (
         <div className="flex flex-col md:flex-row h-full">
-            <div className="w-full md:w-80 h-64 md:h-full overflow-hidden border-b md:border-r flex flex-col">
+            <div className="w-full md:w-64 lg:w-72 h-64 md:h-full overflow-hidden border-b md:border-r flex flex-col">
                 <div className="pr-3 pl-2 pt-2 relative flex items-center space-x-2">
                     <div className="flex-grow relative flex items-center">
                         <Input
