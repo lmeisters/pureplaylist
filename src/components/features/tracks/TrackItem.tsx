@@ -85,7 +85,7 @@ export const TrackItem: React.FC<TrackItemProps> = memo(
         return (
             <>
                 <div
-                    className={`grid grid-cols-[3rem,1fr,auto,2rem] md:grid-cols-[3rem,2fr,1fr,6rem,6rem,4rem,2rem,var(--scrollbar-width)] gap-2 md:gap-4 items-center p-2 text-xs md:text-sm hover:bg-accent/50 relative ${
+                    className={`grid grid-cols-[3rem,1fr,auto,2rem] sm:grid-cols-[3rem,2fr,4rem,2rem] md:grid-cols-[3rem,2fr,6rem,4rem,2rem,var(--scrollbar-width)] lg:grid-cols-[3rem,2fr,1fr,6rem,6rem,4rem,2rem,var(--scrollbar-width)] gap-2 md:gap-4 items-center p-2 text-xs md:text-sm hover:bg-accent/50 relative ${
                         isFiltered ? "bg-yellow-50" : ""
                     } ${isDeleted ? "opacity-50 line-through" : ""}`}
                 >
@@ -119,10 +119,10 @@ export const TrackItem: React.FC<TrackItemProps> = memo(
                             </span>
                         </div>
                     </div>
-                    <div className="truncate hidden md:block">
+                    <div className="truncate hidden sm:block md:hidden lg:block">
                         {item.track.album.name}
                     </div>
-                    <div className="text-sm text-muted-foreground hidden md:flex justify-center">
+                    <div className="text-sm text-muted-foreground hidden lg:flex justify-center">
                         {formatDate(item.track.album.release_date)}
                     </div>
                     <div className="text-sm text-muted-foreground hidden md:flex justify-center">
@@ -134,7 +134,7 @@ export const TrackItem: React.FC<TrackItemProps> = memo(
                             "-"
                         )}
                     </div>
-                    <div className="text-sm text-muted-foreground flex justify-center w-full">
+                    <div className="text-sm text-muted-foreground flex justify-center">
                         {formatDuration(item.track.duration_ms)}
                     </div>
                     <div className="flex justify-center w-full">

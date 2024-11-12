@@ -610,7 +610,7 @@ const TrackList: React.FC<TrackListProps> = ({
                 onClearFilters={clearFilters}
                 initialFilters={filterCriteria}
             />
-            <div className="p-2 font-semibold border-b grid grid-cols-[3rem,2fr,auto,2rem] md:grid-cols-[3rem,2fr,1fr,6rem,6rem,4rem,2rem,var(--scrollbar-width)] gap-2 md:gap-4 items-center text-xs md:text-sm">
+            <div className="p-2 font-semibold border-b grid grid-cols-[3rem,1fr,auto,2rem] sm:grid-cols-[3rem,2fr,4rem,2rem] md:grid-cols-[3rem,2fr,6rem,4rem,2rem,var(--scrollbar-width)] lg:grid-cols-[3rem,2fr,1fr,6rem,6rem,4rem,2rem,var(--scrollbar-width)] gap-2 md:gap-4 items-center text-xs md:text-sm">
                 <SortButton
                     field="number"
                     sortField={sortField}
@@ -633,7 +633,7 @@ const TrackList: React.FC<TrackListProps> = ({
                     sortField={sortField}
                     sortOrder={sortOrder}
                     toggleSort={toggleSort}
-                    className="hidden md:flex justify-center"
+                    className="hidden sm:flex md:hidden lg:flex"
                 >
                     Album
                 </SortButton>
@@ -643,7 +643,7 @@ const TrackList: React.FC<TrackListProps> = ({
                     sortOrder={sortOrder}
                     toggleSort={toggleSort}
                     icon="calendar"
-                    className="hidden md:flex justify-center"
+                    className="hidden lg:flex justify-center"
                 />
                 <SortButton
                     field="bpm"
@@ -659,11 +659,10 @@ const TrackList: React.FC<TrackListProps> = ({
                     sortOrder={sortOrder}
                     toggleSort={toggleSort}
                     icon="clock"
-                    className="flex justify-center w-full"
+                    className="flex justify-center"
                 />
-                <div className="flex items-center justify-center w-full">
+                <div className="flex items-center justify-center">
                     <Checkbox
-                        id="multi-select-mode"
                         checked={isMultiSelectMode}
                         onCheckedChange={(checked) =>
                             setIsMultiSelectMode(checked as boolean)
